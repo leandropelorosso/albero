@@ -1,12 +1,21 @@
 # Albero Forecasts
 
+
+Albero is a Visual analytics solution for the visualization and analysis of probabilistic weather forecasts based on the RAR technique. Albero targets at least two different types of users: meteorologists who work in operational weather forecasting (forecasters) and meteorologists who are researchers working on numerical weather prediction (researchers). 
+Albero provides with an efficient tool for analyzing precipitation forecasts, allowing forecasters to make and communicate decisions.
+
+![Alt text](docs/images/img0.jpg)
+
+
+## Development Details
+
 This document will explain some of the internal details of the implementation. 
 
 The algorithm implemented by Albero has three well defined parts: Read Historic Forecast, Calculate Analogs, and Calculate Probabilistic Forecast.
 
-## Read Historic Forecast 
+### Read Historic Forecast 
 
-### ReadHistoricForecast()
+#### ReadHistoricForecast()
 
 Invokes the reading of the historical refororecasts and current forecast. We’ll call current forecast to the forecast for which the probabilistic forecast will be generated. The reforecast files contain precipitation accumulation data sorted by Latitude, Longitude, Time (date) and Hour. 
 It is stored in the NetCDF file as follows:
@@ -81,8 +90,8 @@ historical_forecast_by_range[NRANGE] : NYEARS x NTIME_WINDOW x NLAT x NLON
 current_forecast_by_range[NRANGE]: NLAT x NLON
 ```
 
-## Calculate Analogs
-### CalculateAnalogs()
+### Calculate Analogs
+#### CalculateAnalogs()
 
 The idea is to find which past forecasts are most similar to the forecast on a given date (current forecast), for all accumulation ranges.
 For each accumulation range, we will find analogs for each region of 1° x 1°. Even when we are looking for analogs for a  1° x 1° region, we will consider the surrounding  3°x 3° area.
@@ -98,9 +107,9 @@ The analogs are stored per accumulation range, latitude and longitude, associate
 analogs: NLAT x NLON x NRANGES x N_ANALOGS_PER_LAT_LON
 ```
 
-## Calculate Probabilistic Forecasts
+### Calculate Probabilistic Forecasts
 
-### CalculateProbabilisticForecast()
+#### CalculateProbabilisticForecast()
 
 The process is quite simple. We need a probabilistic forecast for each accumulation group and threshold selected by the user. Each 1° x 1° region will be sampled in 5 x 5 points (OBSERVATIONS_PER_PANEL). For each sampled point, we’ll look at the precipitation observed on the dates on the 3° x 3° are of the containing 1° x 1° region. Based on weather or not the precipitation observed for each point surpasses the threshold, a probability will be calculated.
 
