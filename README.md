@@ -17,7 +17,7 @@ NTIME x NFHOUR x NLAT x NLON
 ```
 
 
-
+![Alt text](docs/images/img1.jpg)
 
 
 
@@ -36,6 +36,9 @@ The current forecast is read from a NetCDF file as well, and since it correspond
 NHOUR x NLAT x NLON
 ```
 
+![Alt text](docs/images/img2.jpg)
+
+
 The algorithm requires historical forecasts solely for dates around the current forecast date, for past years, so a 90 days window surrounding the current date will be taken from the historical data, for each available year.
 
 
@@ -43,7 +46,7 @@ The algorithm requires historical forecasts solely for dates around the current 
 NYEARS x NTIMEWINDOW (90 days) x NFHOUR x NLAT x NLON
 ```
 
-
+![Alt text](docs/images/img3.jpg)
 
 After the current and historical reforecasts are read, the accumulation ranges must be computed. For instance, if the user wishes to visualize a 24 hours probabilistic forecast accumulated by 12 hours, then two accumulation ranges will be computed (this is simply done by adding hourly precipitations).
 
@@ -55,6 +58,8 @@ After computing the historical accumulation ranges for the required temporal win
 ```
 NYEARS x NTIME_WINDOW x NLAT x NLON
 ```
+
+![Alt text](docs/images/img4.jpg)
 
 
 These structures only store data, there is no description about the actual year, day, latitude or longitude.
@@ -71,16 +76,18 @@ fhour has no descriptor, since we know it is every 6 hours.
 
 As a summary, there are two structures used on the next step of the method:
 
+```
 historical_forecast_by_range[NRANGE] : NYEARS x NTIME_WINDOW x NLAT x NLON
 current_forecast_by_range[NRANGE]: NLAT x NLON
+```
 
-Calculate Analogs
-CalculateAnalogs()
+## Calculate Analogs
+### CalculateAnalogs()
 
 The idea is to find which past forecasts are most similar to the forecast on a given date (current forecast), for all accumulation ranges.
 For each accumulation range, we will find analogs for each region of 1° x 1°. Even when we are looking for analogs for a  1° x 1° region, we will consider the surrounding  3°x 3° area.
 
-
+![Alt text](docs/images/img5.jpg)
 
 
 The analogs are computed finding those historical forecasts with lower mean square error (MSE) on the 16 points of the of the grid. 
@@ -118,7 +125,7 @@ We are adding +1 since in addition to the observations, we will store the distan
 
 The algorithm starts by iterating each 1° x 1° region from the left bottom of the grid.
 
-
+![Alt text](docs/images/img6.jpg)
 
 (Remember, the analogs for the 3° x 3° region are stored associated to the black dot)
 
@@ -132,6 +139,7 @@ The next step is to iterate the small points inside the surrounding area, and st
 
 For each point, the dimension will be calculated as shown on the following image:
 
+![Alt text](docs/images/img7.jpg)
 
 As the first element of the observation array for a given point and dimension, the distance between the point and the center of the region (the blue dot on the previous image) is stored. Note that values on the dimension 4 (which is the one associated to the analogs we used to retrieve the observations) will have the shortest distance to the center (if we we weren’t implementing a smoothing algorithm, only this dimension would have been used).
 
@@ -145,13 +153,13 @@ For every point on each of the probability maps, it is necessary to combine the 
 
 Each point has associated: 
 
-
+![Alt text](docs/images/img7.5.jpg)
 
 Where d is the distance to the center of the region.
 
 The next step is to convert each distance to a non normalized weight, using the following formula:
 
-
+![Alt text](docs/images/img8.jpg)
 
 Where x is [0...8] and D is the biggest distance found.
 
@@ -164,13 +172,12 @@ w_i =  w'_i / ( w'_0 + w'_1 + w'_2 + w'_3 + w'_4 + w'_5 + w'_6 + w'_7 + w'_8)
 
 After normalizing the weights, we then have, for each point:
 
-
+![Alt text](docs/images/img9.jpg)
 
 So now, for each accumulation range r and threshold t, we take each point and calculate the probability as follows:
 
-```
-i=08 wi *pi(t) 
-```
+![Alt text](docs/images/img10.jpg)
+
 Where pi(t)is the probability of finding an observation v higher than t, which is:
 
 ```
