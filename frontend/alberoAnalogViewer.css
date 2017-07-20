@@ -1,0 +1,168 @@
+
+#alberoAnalogViewer .analog_forecast_wrapper{
+	margin-right: 20px;
+	margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#alberoAnalogViewer .big_grid{
+    position: absolute;
+    width: 152px;
+    height: 152px;
+    background-size: 51px 51px;
+    background-image: repeating-linear-gradient(0deg, #000, #000 1px, transparent 1px, transparent 51px),repeating-linear-gradient(-90deg, #000, #000 1px, transparent 1px, transparent 51px);
+    opacity: 0.14;
+    top: 0;
+    left: 0;
+    z-index: 96;
+}
+
+#alberoAnalogViewer .image_label{
+    margin: 0px;
+}
+
+#alberoAnalogViewer img{
+	border: 1px solid grey;
+}
+
+#alberoAnalogViewer .analog_observation p{
+	font-size: 8px;
+}
+
+#alberoAnalogViewer .analog_observation .labels{
+	margin-top: 4px;
+	margin-bottom: 8px;
+}
+#alberoAnalogViewer .analog_observation .labels p.mse,
+#alberoAnalogViewer .analog_observation .labels p.date{
+    margin-top: 5px;
+    margin-bottom: 4px;
+}
+
+
+#alberoAnalogViewer .analog_forecast_wrapper img{
+	height: 50px;
+	width: 50px;
+}
+
+
+#alberoAnalogViewer .analog_forecast_wrapper .analog_forecast{
+	margin-bottom: 10px;
+}
+
+
+.big_scale{
+    display: inline-block;
+    position: relative;
+    height: 152px;
+}
+
+#alberoAnalogViewer .big-box-wrapper{
+    width: 250px;
+    float:left; 
+    position:relative;
+}
+
+#alberoAnalogViewer .big-box-wrapper .image_label{
+    width: 154px;
+    text-align: center;   
+    margin-top: 19px;
+}
+
+
+.big_scale .total_max,
+.big_scale .total_min,
+.big_scale .max,
+.big_scale .min
+{
+    position: absolute;
+    left: 14px;
+    padding:0px;
+    margin:0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    font-size: 10px;
+}
+
+.big_scale .total_max{
+    bottom: 158px;
+}
+ 
+
+.big_scale .total_min{
+    margin-top: 11px;
+    bottom: -19px;
+}
+
+.big_scale .total_max,
+.big_scale .total_min{
+    margin-left: -28px;
+}
+
+
+/*#alberoAnalogViewer #albero_analog_viewer_summary ul li{
+    font-size: 11px;
+}*/
+
+#alberoAnalogViewer #albero_analog_viewer_summary table{
+   font-size: 11px; 
+   margin-top: 15px;
+}
+
+#alberoAnalogViewer #albero_analog_viewer_summary td{
+    background-color: #fafafa;
+    color:grey;
+}
+
+#alberoAnalogViewer #albero_analog_viewer_summary th{
+   background-color:#eeeeee;
+   text-align: left;
+}
+
+
+#alberoAnalogViewer .scale_indicators{
+    height: 100%;
+    position: absolute;
+    top: 0px;
+}
+
+
+.scale_indicators .max,
+.scale_indicators .min{
+    background-image: url("albero_resources/icon_arrow_left_black.png");
+    height: 12px;
+    width: 5px;
+    background-position-y: center;
+    background-repeat: no-repeat;
+    padding-left: 8px;
+    margin-bottom: -7px;
+    color: #555555;
+}
+
+#alberoAnalogViewer .title-h2{
+    background-color: khaki;
+    padding: 8px;
+    margin-bottom: 18px;
+    display: inline-block;
+    margin-top: -4px;
+    width: auto;
+    color: black;
+}
+
+#alberoAnalogViewer .analog-list-labels{
+    text-align: right;
+    float: left;
+    width: 73px;
+    padding-right: 20px;
+}
+
+#alberoAnalogViewer .analog-list-labels div:nth-child(1){
+    padding-top: 24px;
+    padding-bottom: 11px;
+}
+
+
+#alberoAnalogViewer .analog-list-labels div:nth-child(3){
+    height: 20px;
+    margin-bottom: -3px;
+}

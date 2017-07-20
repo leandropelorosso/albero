@@ -1,0 +1,67 @@
+body{
+	margin:0px;
+	padding:0px;
+}
+
+#albero-wrapper{
+	width: 100%;
+	height: 100%;
+	position: absolute;
+}
+
+#mini-bingmaps{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    padding: 15px;
+    background-color:white;
+    width: 270px;
+    display: none;
+    padding-bottom: 0px;
+}
+
+#mini-bingmaps .map-sub-wrapper{
+	position: relative;
+}
+
+#mini-bingmaps .label{
+	padding-left: 65px;
+	text-align: center;
+	height: 40px;
+}
+
+#mini-bingmaps .mini_bing_map{
+    width: 200px;
+    height: 200px;
+    position: relative;
+    margin-bottom: 10px;
+    margin-left: 68px;
+}
+
+#mini-bingmaps .mini_bing_map .MicrosoftMap{
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+
+#mini-bingmaps .OverlaysBL,
+#mini-bingmaps .OverlaysBR-logoAware,
+#mini-bingmaps .OverlaysTL{
+	display: none;
+}
+
+#mini-bingmaps .albero_floating_scale{
+	position: absolute;
+	left: -9px;
+	top: 0px;
+	width: 55px;
+    padding-left: 0px;
+    border: none;
+    padding-top: 17px;
+    z-index: 0;
+}
+
+#mini-bingmaps .albero_floating_scale .img_floting_scale{
+    border: 1px solid lightgray;
+}

@@ -1,0 +1,65 @@
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* 
+	TODO: Hacer que #alberoToolbox no sea resizeable
+*/
+#alberoToolbox
+{
+	/*height:102px !important;
+	min-height:102px !important;*/
+}
+
+#alberoToolbox .ui-button{
+	margin-right: 10px;
+}
+
+#alberoToolbox ul
+{
+	padding:0px;
+	list-style:none;
+}
+
+#alberoToolbox ul li
+{
+	float:left;
+}
+
+
+#albero_floating_scale .img_floting_scale{
+	border: 1px solid grey;
+} 
+
+
+.MicrosoftMap .OverlaysTL {
+    left: 80px!important;
+    top: 7px!important;
+}
+
+#albero-server-status{
+	line-height: 26px;
+    margin-right: 10px;
+    font-size: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 5px;
+    color: white;
+}
+    
+#albero-server-status.unknown{
+	    background-color: lightgrey;
+}
+
+#albero-server-status.up{
+	    background-color: darkseagreen;
+}
+
+#albero-server-status.down{
+	    background-color: indianred;
+}

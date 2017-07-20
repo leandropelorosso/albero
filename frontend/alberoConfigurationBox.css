@@ -1,0 +1,172 @@
+	*{
+		font-size:12px;
+		font-weight:normal;
+	}
+
+	#alberoConfigurationBox h3
+	{
+	    /* font-weight: bold; */
+	    /* border-bottom: 1px solid #B5B5B5; */
+	    padding-bottom: 0px;
+	    margin-top: 23px;
+	}
+	
+	#alberoConfigurationBox ul 
+	{
+		list-style:none;
+		padding:0px;
+		width:100%;
+		height:20px;
+	}
+	
+	#alberoConfigurationBox ul li
+	{
+		float:left;
+	}
+	
+	#alberoConfigurationBox ul li
+	{
+		margin-right:5px;
+		margin-left:5px;
+	}
+
+	#alberoConfigurationBox ul li:first-of-type
+	{
+		margin-left:0px;
+	}
+	
+	#alberoConfigurationBox ul li:last-of-type:after
+	{
+		clear:both;
+		margin-right:0px;
+	}
+
+	#alberoConfigurationBox ul li input
+	{
+		padding:2px 2px;
+	}
+	
+	#alberoConfigurationBox ul li input.date
+	{	
+		width:90px;
+	}
+
+	#alberoConfigurationBox ul li input.small
+	{
+		width:50px;
+	}
+	
+	#alberoConfigurationBox ul li .slider
+	{
+		width:100%;
+	}
+	
+	#alberoConfigurationBox ul .slider-container
+	{
+		width:250px;
+	}
+	
+	#alberoConfigurationBox ul li.float-right{
+		float:right;
+	}
+
+	#alberoConfigurationBox .elessar-range{
+		background-color: antiquewhite;
+		text-align: center;
+	}
+
+	#alberoConfigurationBox .elessar-range.elessar-phantom{
+		background-color: red;
+	}
+
+	#alberoConfigurationBox .elessar-handle{
+		background-color: orange;
+	}
+
+	#alberoConfigurationBox .elessar-rangebar{
+	    border: 1px solid darkkhaki;
+	}
+
+
+	#alberoConfigurationBox input{
+		border: 1px solid lightgray;
+	    margin-top: -2px;	
+	}
+	
+	#alberoConfigurationBox #btn-calculate{
+		background-color: cornflowerblue;
+	    color: white;
+	    padding: 10px;
+	    border: 1px solid lightblue;
+	    border-radius: 8px;
+	    border: none;
+	    cursor: pointer;
+	    outline: none;
+	}
+
+	#alberoConfigurationBox #btn-calculate:hover{
+		background-color: lightslategrey;
+	}
+
+
+
+
+#threshold_ranges .ui-slider-handle,
+#threshold_ranges .ui-slider-handle:focus {
+    border: 1px solid #d19405;
+    background: #fece2f;
+    font-weight: bold;
+    color: #4c3000;
+    width: 24px;
+    height: 24px;
+    margin-top: -3px;
+    border-radius: 19px;
+    outline: none;
+    margin-left: -10px;
+}
+
+#threshold_ranges.ui-slider{
+	background: #feeebd;
+	border: 1px solid #d19405;
+	height: 12px;
+	width: 350px;
+    margin-left: 9px;
+}
+
+.elessar-barlabel{
+	font-size: 11px;
+}
+
+
+.radio-section-selector{
+    width: 100%;
+    display: block;
+    background-color: #f1f1f1;
+    line-height: 28px;
+}
+
+
+.ui-accordion .ui-accordion-content {
+    overflow: auto;
+    padding: 5px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    border: none;
+    background: none;
+}
+
+#accordion .ui-accordion-header {
+	background: #f2f2f2;
+    border: none;
+    border-radius: 0px;
+    padding-bottom: 7px;
+    margin-top: 0px;
+    outline: none;
+    margin-bottom: 8px;
+    width: 190px;
+}
+
+
+#alberoConfigurationBox h3{
+	font-weight: bold;
+}

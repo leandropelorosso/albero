@@ -1,0 +1,85 @@
+#alberoMipmapDialog .ubermap_scale{
+    margin-top: 41px;
+    margin-bottom: 10px;
+    margin-left: 26px;
+}
+
+#alberoMipmapDialog .ubermap_scale img{
+    width: 256px;
+    height: 10px;
+}
+
+#alberoMipmapDialog .threshold_map_selector{
+	cursor: pointer;
+	text-align: center;
+}
+
+#alberoMipmapDialog .threshold_map_selector .threshold_selctor_image_wrapper img{
+		border: 1px solid #ccc;
+}
+
+#alberoMipmapDialog .threshold_map_selector .threshold_selctor_image_wrapper .ubermap_minimap
+{
+    /* -moz-transform: scaleY(-1);
+        -o-transform: scaleY(-1);
+        -webkit-transform: scaleY(-1);
+        transform: scaleY(-1);
+        filter: FlipV;
+        -ms-filter: "FlipV";*/
+}
+
+#alberoMipmapDialog .threshold_map_selector .threshold_selctor_image_wrapper .ubermap_contour{
+    position: absolute;
+    top:0px;
+    left: 2px;
+}
+
+#alberoMipmapDialog .threshold_map_selector .threshold_selctor_image_wrapper
+{
+	width: 96px;
+    position: relative;
+    margin-right: 3px;
+    margin-bottom: 3px;
+}
+
+    
+#alberoMipmapDialog .ubermap-column-header span{
+    display: block;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    color: black;
+    width: 100%;
+}
+
+#alberoMipmapDialog .ubermap-column-header.active span{
+    background-color: orange;
+}
+
+#alberoMipmapDialog .threshold_map_selector.label p{
+	border: 1px solid #ccc;
+    width: 90px;
+    text-align: center;
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+#alberoMipmapDialog .threshold_map_selector.active .ubermap_contour{
+    margin-top: -1px;
+    margin-left: -1px;
+}
+
+#alberoMipmapDialog .threshold_map_selector.active .ubermap_contour,
+#alberoMipmapDialog .threshold_map_selector.label.active p{
+    border: 2px solid orange;
+}
+
+#alberoMipmapDialog td:first-child{
+    border-right: 4.2px solid white;
+}
+
+#alberoMipmapDialog td:first-child.active{
+    background-color: orange;   
+}
