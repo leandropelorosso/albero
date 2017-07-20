@@ -1,4 +1,4 @@
-# Albero Forecasts
+# Albero Forecast
 
 
 Albero is a Visual analytics solution for the visualization and analysis of probabilistic weather forecasts based on the RAR technique. Albero targets at least two different types of users: meteorologists who work in operational weather forecasting (forecasters) and meteorologists who are researchers working on numerical weather prediction (researchers). 
