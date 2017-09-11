@@ -3,7 +3,8 @@
 #include "helper.h"
 #include "ForecastReader.h"
 #include <list>
-
+#include "ColorSchema.h"
+#include "map"
 
 // When initializing Albero2 for a particular date, this struct will be filled and returned, 
 // to be able to display minimun and maxumun values on the client's side.
@@ -53,7 +54,9 @@ public:
 	
 	float **current_forecast_by_range = NULL; // current forecast by range
 	float **historic_forecast_by_range = NULL; // history forecasts by range
-	
+    std::map<int, long> *historical_forecast_index_by_range_and_date; // given the date, we can retrieve the start of the information for said day,
+                                                                      // as historic_forecast_by_range_and_date[range_index][date]
+
 	AnalogIndex *analogs = NULL; // Analogs
 	
 	std::list<ThresholdRange> threshold_ranges; // the threshold ranges
@@ -87,6 +90,7 @@ public:
 	int NYEARS;
 
 	Statistics *stats = NULL;
+
 
 };
 

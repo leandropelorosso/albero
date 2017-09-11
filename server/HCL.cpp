@@ -129,10 +129,13 @@ float3 hcl2rgb(float c, float s, float l) {
 	return lab2rgb(L, a, b);
 };
 
+hcl::hcl(){
+}
 
-
-hcl::hcl()
+hcl::hcl(Vector2 from_color, Vector2 to_color)
 {	
+    this->from_color = from_color;
+    this->to_color = to_color;
 }
 
 
@@ -141,39 +144,10 @@ hcl::~hcl()
 }
 
 
-// Renders a scale of 1px by height and returns the data url
-// width: height of the scale
-// height: height of the scale
-// min_value: min data value
-// max_value: max data value
-// from_color and to_color, the arrays for start and end of the vector on the HCL space.
-void hcl::render_scale(int width, int height, float min_value, float max_value, string filename){
-	
-	float *values = new float[width*height];
+rgb hcl::get_color(float min_value, float max_value, float value, bool transparency){
 
-	float diff = max_value - min_value;
-
-	for (int y = 0; y < height; y++){
-
-		//float v = (diff / height) * y;
-		float v = (max_value - min_value) / height*y + min_value;
-		
-		for (int x = 0; x < width; x++){
-
-			values[(height-y-1)*width + x] = v;
-
-		}
-	}
-
-	char* img = ImageFromValuesArray(values, width, height, 1, min_value, max_value);
-	WriteImage(img, width, height, filename);
-	delete(values);
-	delete(img);
-
-}
-
-
-rgb hcl::get_color(Vector2 from_color, Vector2 to_color, float min_value, float max_value, float value, bool transparency){
+    // discretize the value if setted
+    value = discrete(value);
 
 	if (isnan(value)){
 
@@ -230,34 +204,6 @@ rgb hcl::get_color(Vector2 from_color, Vector2 to_color, float min_value, float 
 	
 
 	return r;
-}
-
-rgb hcl::get_color_blue_red_diverging(float min_value, float max_value, float value){
-	
-	float h, c, l;
-	float fabs_value = fabs(value);
-
-	if (value<0) h = 254.0f; else h = 0;
-
-	float v1 = 2.1607142857142856f;
-	float v3 = 0.4634523809523809f;
-	float v2 = 0.053571428571428575f;
-	float v4 = 1.2689285714285714f;
-
-	
-	c = ((v1 - v2) / max_value)*fabs(value) + v2;
-	l = ((v3 - v4) / max_value)*fabs(value) + v4;
-
-
-	float3 color = (hcl2rgb(h, c, l));
-
-	rgb r;
-	r.r = (int)color.x;
-	r.g = (int)color.y;
-	r.b = (int)color.z;
-	r.a = 255;
-	return r;
-	
 }
 
 // esto es para calcular colores con H constante. 
@@ -319,4 +265,39 @@ rgb hcl::get_color_constant_H(Vector2 from_color, Vector2 to_color, float H, flo
 	return r;
 }
 
+
+HCLDiverging::HCLDiverging(){
+}
+
+// get_color_blue_red_diverging
+rgb HCLDiverging::get_color(float min_value, float max_value, float value, bool transparency){
+
+    // discretize the value if setted
+    value = discrete(value);
+
+    float h, c, l;
+    float fabs_value = fabs(value);
+
+    if (value<0) h = 254.0f; else h = 0;
+
+    float v1 = 2.1607142857142856f;
+    float v3 = 0.4634523809523809f;
+    float v2 = 0.053571428571428575f;
+    float v4 = 1.2689285714285714f;
+
+
+    c = ((v1 - v2) / max_value)*fabs(value) + v2;
+    l = ((v3 - v4) / max_value)*fabs(value) + v4;
+
+
+    float3 color = (hcl2rgb(h, c, l));
+
+    rgb r;
+    r.r = (int)color.x;
+    r.g = (int)color.y;
+    r.b = (int)color.z;
+    r.a = 255;
+    return r;
+
+}
 

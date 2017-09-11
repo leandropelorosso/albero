@@ -21,7 +21,8 @@
 #include "Albero2.h"
 #include "ObservationReader.h"
 #include "Color.h"
-
+#include "Palette.h"
+#include "ColorSchema.h"
 
 
 #include <sys/socket.h>
@@ -31,8 +32,14 @@
 #include <thread>
 #include <mutex> 
 
+#include <IL/il.h>
+
 mutex queue_mutex;
 
+ColorSchema* PCT::numerical_forecast_schema;
+ColorSchema* PCT::probabilistic_forecast_schema;
+ColorSchema* PCT::mse_schema;
+ColorSchema* PCT::bias_schema;
 
 /*
 #include "DevIL/include/IL/il.h"
@@ -216,7 +223,14 @@ string ProcessCommand(string cmd)
 			string s_range_index = document["range_index"].GetString();
 			int range_index = ::atoi(s_range_index.c_str());
 
-			int init_lat_pixel = (y + 1) * 256;
+            // obtenemos la fecha deseada si existe
+            int date = (albero2->current_date) * 100;
+            if(document.HasMember(("date"))){
+                string s_date = document["date"].GetString();
+                date = ::atoi(s_date.c_str());
+            }
+
+            int init_lat_pixel = (y + 1) * 256;
 			int end_lat_pixel = y * 256;
 			int init_lon_pixel = x * 256;
 			int end_lon_pixel = (x + 1) * 256;
@@ -224,7 +238,6 @@ string ProcessCommand(string cmd)
 			cout << "REQ>>NumForecast>> " << x << ", " << y << ", " << z << endl;
 
 			/* Grabamos los valores interpolados */
-			int date = (albero2->current_date) * 100;
 			float *observation_values = ObservationReader::GetInterpolatedValuesLambert(date, range_index, init_lat_pixel, init_lon_pixel, end_lat_pixel, end_lon_pixel, 256, 256, z);
 			if (observation_values == NULL) {
 				return "none";
@@ -233,7 +246,7 @@ string ProcessCommand(string cmd)
 
 
 			string probabilistic_forecast_image_filename = albero_images_path + "probabilistic_forecast_" + to_string((int)x) + "_" + to_string((int)y) + "_" + to_string((int)z) + ".png";
-			WriteImage(observation_values, 256, 256, probabilistic_forecast_image_filename, 0.0f, 60.0f);
+            WriteImage(PCT::numerical_forecast_schema, observation_values, 256, 256, probabilistic_forecast_image_filename, 0.0f, 60.0f);
 
 			delete(observation_values);
 
@@ -281,7 +294,7 @@ string ProcessCommand(string cmd)
 			PCT::SelectScale(-7, true);
 
 			string probabilistic_forecast_image_filename = albero_images_path + "probabilistic_forecast_" + to_string((int)x) + "_" + to_string((int)y) + "_" + to_string((int)z) + ".png";
-			WriteImage(interpolated_values, 256, 256, probabilistic_forecast_image_filename, 0,/*1.0f/ albero2->N_ANALOGS_PER_LAT_LON*/ 100.0f);
+            WriteImage(PCT::probabilistic_forecast_schema, interpolated_values, 256, 256, probabilistic_forecast_image_filename, 0,/*1.0f/ albero2->N_ANALOGS_PER_LAT_LON*/ 100.0f);
 			delete(interpolated_values);
 
 			return probabilistic_forecast_image_filename;
@@ -290,7 +303,71 @@ string ProcessCommand(string cmd)
 		// ----------------------------------------------------------------------------------------------------
 		// GET NUMERICAL FORECAST TILE (FOR THE HISTORIC FORECAST)
 		// ----------------------------------------------------------------------------------------------------
+   //   historical_forecast_index_by_range_and_date[range][date]
 
+
+              if (command == "get_num_forecast")
+              {
+                  string s_lat = document["y"].GetString();
+                  float y = ::atof(s_lat.c_str());
+
+                  string s_lon = document["x"].GetString();
+                  float x = ::atof(s_lon.c_str());
+
+                  string s_zoom = document["z"].GetString();
+                  float z = ::atof(s_zoom.c_str());
+
+                  string s_range_index = document["range_index"].GetString();
+                  int range_index = ::atoi(s_range_index.c_str());
+
+                  // obtenemos la fecha deseada si existe
+                  int current_date = (albero2->current_date) * 100;
+                  int requested_date = current_date;
+
+                  if(document.HasMember(("date"))){
+                      string s_date = document["date"].GetString();
+                      requested_date = ::atoi(s_date.c_str());
+                  }
+
+                  int init_lat_pixel = (y + 1) * 256;
+                  int end_lat_pixel = y * 256;
+                  int init_lon_pixel = x * 256;
+                  int end_lon_pixel = (x + 1) * 256;
+
+                  cout << "REQ>>NumForecast>> " << x << ", " << y << ", " << z << endl;
+
+                  // Grabamos los valores interpolados
+
+                  float *forecast = NULL;
+                  if(current_date!=requested_date){
+                      int historical_forecast_index = albero2->historical_forecast_index_by_range_and_date[range_index][requested_date];
+                      forecast = &albero2->historic_forecast_by_range[range_index][historical_forecast_index];
+                  }else{
+                      forecast = albero2->current_forecast_by_range[range_index];
+                  }
+
+                  float* interpolated_values = Interpolate8(forecast, (int)albero2->forecasts->NLON, (int)albero2->forecasts->NLAT,
+                      albero2->forecasts->lats[0],
+                      albero2->forecasts->lons[0],
+                      albero2->forecasts->lats[albero2->forecasts->NLAT - 1],
+                      albero2->forecasts->lons[albero2->forecasts->NLON - 1],
+                      init_lat_pixel, init_lon_pixel, end_lat_pixel, end_lon_pixel, 256, 256, z);
+
+
+                  PCT::SelectScale(-3, true);
+                  string probabilistic_forecast_image_filename = albero_images_path + "num_forecast_" + to_string((int)x) + "_" + to_string((int)y) + "_" + to_string((int)z) + ".png";
+                  cout << probabilistic_forecast_image_filename << endl;
+
+                  WriteImage(PCT::numerical_forecast_schema, interpolated_values, 256, 256, probabilistic_forecast_image_filename, 0,60);
+                  delete(interpolated_values);
+
+                  return probabilistic_forecast_image_filename;
+              }
+
+
+
+
+              /*
 		if (command == "get_num_forecast")
 		{
 			string s_lat = document["y"].GetString();
@@ -312,7 +389,7 @@ string ProcessCommand(string cmd)
 
 			cout << "REQ>>NumForecast>> " << x << ", " << y << ", " << z << endl;
 
-			/* Grabamos los valores interpolados */
+            // Grabamos los valores interpolados
 			float* interpolated_values = Interpolate8(albero2->current_forecast_by_range[range_index], (int)albero2->forecasts->NLON, (int)albero2->forecasts->NLAT,
 				albero2->forecasts->lats[0],
 				albero2->forecasts->lons[0],
@@ -325,11 +402,13 @@ string ProcessCommand(string cmd)
 			string probabilistic_forecast_image_filename = albero_images_path + "num_forecast_" + to_string((int)x) + "_" + to_string((int)y) + "_" + to_string((int)z) + ".png";
 			cout << probabilistic_forecast_image_filename << endl;
 
-			WriteImage(interpolated_values, 256, 256, probabilistic_forecast_image_filename, 0, 60);
+            WriteImage(interpolated_values, 256, 256, probabilistic_forecast_image_filename, 0,60);
 			delete(interpolated_values);
 
 			return probabilistic_forecast_image_filename;
-		}
+        }*/
+
+
 
 		// ----------------------------------------------------------------------------------------------------
 		// GET MEAN SQUARED ERROR TILE
@@ -365,7 +444,7 @@ string ProcessCommand(string cmd)
 
 			PCT::SelectScale(-6, true);
 			string probabilistic_forecast_image_filename = albero_images_path + "mse" + to_string((int)x) + "_" + to_string((int)y) + "_" + to_string((int)z) + ".png";
-			WriteImage(interpolated_values, 256, 256, probabilistic_forecast_image_filename, 0, 20);
+            WriteImage(PCT::mse_schema, interpolated_values, 256, 256, probabilistic_forecast_image_filename, 0, 20);
 			delete(interpolated_values);
 
 			return probabilistic_forecast_image_filename;
@@ -448,7 +527,6 @@ void dispose() {
 	if (albero2 != NULL) {
 		delete(albero2);
 	}
-	PCT::Dispose();
 	Color::Dispose();
 	ObservationReader::Dispose();
 	//TerminateThread(server_thread, 0);
@@ -471,6 +549,20 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
+ //   ilInit();
+
+
+
+        /*Palette::init();
+        Palette::load("C:/albero_color_palettes/blue_clear.png");  // 0
+        Palette::load("C:/albero_color_palettes/blue_deep.png"); // 1
+        Palette::load("C:/albero_color_palettes/blue_ice.png"); // 2
+        Palette::load("C:/albero_color_palettes/blue_sky.png"); // 3
+        Palette::load("C:/albero_color_palettes/blue_spectrum.png"); // 4
+        Palette::load("C:/albero_color_palettes/blue_water.png"); // 5
+        Palette::load("C:/albero_color_palettes/redsky.png"); // 6
+*/
+
 	// Listen for CTRL-C
 	struct sigaction sigIntHandler;
 	sigIntHandler.sa_handler = halt_handler;
@@ -486,29 +578,33 @@ int main(int argc, char* argv[])
 	reforecast_file_path = argv[3];
 
 	
-	cmorph_index_file = cmorph_data_folder + "/index3.txt";
-	cmorph_data_file = cmorph_data_folder + "/cmorph3.dat";
+    cmorph_index_file = cmorph_data_folder + "/index3.txt";
+    cmorph_data_file = cmorph_data_folder + "/cmorph3.dat";
 
 	albero2 = new Albero2();
+
+    //PCT::numerical_forecast_schema = new Palette("/home/vertexar/projects/alberoserver.linux/data/escala_laura.png");
+    //PCT::probabilistic_forecast_schema = new Palette("/home/vertexar/projects/alberoserver.linux/data/escala_probabilidad_laura.png");
+
+    PCT::numerical_forecast_schema = (new hcl(Vector2(80.0f, 1.36f), Vector2(231.00000000000003f, 0.16797619047619047f)))->discretization(5);
+    PCT::probabilistic_forecast_schema = (new hcl(Vector2(65.57142857142857f, 1.2729761904761905f), Vector2(351.0f, 0.3096428571428571f)))->discretization(10);
+    PCT::mse_schema = (new hcl(Vector2(93.00000000000001f, 1.3498809523809523f), Vector2(10.714285714285714f, 0.9694047619047619f)))->discretization(2);
+    PCT::bias_schema = new HCLDiverging();
 
 	cout << "[] ObservationReader::Init()" << endl;
 	ObservationReader::Init();
 
 
-	cout << "[] PCT::Init()";
-	PCT::Init();
-	cout << "  OK" << endl;
-
 	PCT::SelectScale(-3, true);
-	hcl::render_scale(10, 200, 0, 60, albero_images_path + "numerical_forecast_big_scale.png");
+    PCT::numerical_forecast_schema->render_scale(10, 200, 0, 60, albero_images_path + "numerical_forecast_big_scale.png");
 	PCT::SelectScale(-3, false);
-	hcl::render_scale(10, 152, 0, 60, albero_images_path + "numerical_forecast_small_scale.png");
+    PCT::numerical_forecast_schema->render_scale(10, 152, 0, 60, albero_images_path + "numerical_forecast_small_scale.png");
 	PCT::SelectScale(3, false);
-	hcl::render_scale(10, 152, -60, 60, albero_images_path + "bias_small_scale.png");
+    PCT::bias_schema->render_scale(10, 152, -60, 60, albero_images_path + "bias_small_scale.png");
 	PCT::SelectScale(-6, true);
-	hcl::render_scale(10, 152, 0, 20, albero_images_path + "mse_big_scale.png");
+    PCT::mse_schema->render_scale(10, 152, 0, 20, albero_images_path + "mse_big_scale.png");
 	PCT::SelectScale(-7, true);
-	hcl::render_scale(10, 152, 0, 100, albero_images_path + "probabilistic_forecast_big_scale.png");
+    PCT::probabilistic_forecast_schema->render_scale(10, 152, 0, 100, albero_images_path + "probabilistic_forecast_big_scale.png");
 
     cout << "[] Scales Rendered." << endl;
 

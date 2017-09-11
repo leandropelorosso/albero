@@ -3,6 +3,8 @@
 #undef min
 #include <iostream>  
 #include <limits>
+#include "ColorSchema.h"
+
 using namespace std;
 
 // Max and min float values.
@@ -22,16 +24,16 @@ float *Interpolate8(float *input, int input_width, int input_height, float input
 float BilinearInterpolation(float q11, float q12, float q21, float q22, float x1, float x2, float y1, float y2, float x, float y);
 
 // Convertes a float* worth of numerical data to an image mapping values with colors
-char* ImageFromValuesArray(float *input, int width, int height, int pixel_size, float min_value, float max_value);
+char* ImageFromValuesArray(ColorSchema*schema, float *input, int width, int height, int pixel_size, float min_value, float max_value);
 
 // saves an image to a png file, from a RGB array
 void WriteImage(char* input, int width, int height, string filename);
 
 // Writes a values array to a PNG files. The given parameter are values, so they are mapped to colors before being written to the PNG.
-void WriteImage(float* input, int width, int height, string filename, int pixel_size, float min_value, float max_value);
+void WriteImage(ColorSchema *schema, float* input, int width, int height, string filename, int pixel_size, float min_value, float max_value);
 
 // Writes a values array to a PNG files. The given parameter are values, so they are mapped to colors before being written to the PNG.
-void WriteImage(float* input, int width, int height, string filename, float min_value, float max_value);
+void WriteImage(ColorSchema *schema, float* input, int width, int height, string filename, float min_value, float max_value);
 
 // paints a pixel into a char array
 void paint_pixel(char* img, int img_w, int img_h, int x, int y, int r, int g, int b, int a);
@@ -43,6 +45,7 @@ struct Vector2
 {
 	float x;
 	float y;
+    Vector2(){};
 	Vector2(float x, float y){
 		this->x = x;
 		this->y = y;

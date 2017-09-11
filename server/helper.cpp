@@ -212,70 +212,33 @@ void WriteImage(char* image, int width, int height, string filename)
 	
 }
 
-char* ImageFromValuesArray(float *input, int width, int height, int pixel_size, float min_value, float max_value)
+char* ImageFromValuesArray(ColorSchema* schema, float *input, int width, int height, int pixel_size, float min_value, float max_value)
 {
 	char* image = new char[width * height * 4 * pixel_size * pixel_size];
 	if (!input) return NULL;
 	for (int y = 0; y <height; y++){
 		for (int x = 0; x<width; x++){
 			int i = y * width + x;
-
-			if (PCT::current_scale == 3){ // BIAS
-				float value = input[i];
-				rgb c = hcl::get_color_blue_red_diverging(min_value, max_value, value);
-				paint_pixel(image, width, height, x, y, c.r, c.g, c.b, c.a, pixel_size);
-			}
-			else
-			{
-				if (PCT::current_scale == -3){ // HCL for for observations and reforecasts
-					float value = input[i];
-					value = ((floor(value / 5.0f))*5.0f);
-					Vector2 to_color(231.00000000000003f, 0.16797619047619047f);
-					Vector2 from_color(80.0f, 1.36f);
-					rgb c =hcl::get_color(from_color, to_color, 0.0f, max_value, value, PCT::transparency);
-					paint_pixel(image, width, height, x, y, c.r, c.g, c.b, c.a, pixel_size);
-				}
-				else if (PCT::current_scale == -6){ // HCL for MSE with DISCRETIZATION
-					Vector2 from_color(93.00000000000001f, 1.3498809523809523f);
-					Vector2 to_color(10.714285714285714f, 0.9694047619047619f);
-					float value = input[i];
-					value = ((floor(value / 2))*2.0f);
-					rgb c = hcl::get_color(from_color, to_color, 0.0f, max_value, value, PCT::transparency);
-					paint_pixel(image, width, height, x, y, c.r, c.g, c.b, c.a, pixel_size);
-				}
-				else if (PCT::current_scale == -7){ // HCL for probabilities WITH DISCRETIZATION
-					Vector2 from_color(65.57142857142857f, 1.2729761904761905f);
-					Vector2 to_color(351.0f, 0.3096428571428571f);
-					float value = input[i];
-					value = ((floor(value / 10.0f))*10.0f);
-					rgb c = hcl::get_color(from_color, to_color, 0.0f, max_value, value, PCT::transparency);
-					paint_pixel(image, width, height, x, y, c.r, c.g, c.b, c.a, pixel_size);
-				}
-				else
-				{ 
-					rgb c = Color::from_palette(min_value, max_value, input[i]);
-					paint_pixel(image, width, height, x, y, c.r, c.g, c.b, c.a, pixel_size);
-				}
-			}
-			
-			
+            float value = input[i];
+            rgb c=schema->get_color(min_value, max_value, value, PCT::transparency);
+            paint_pixel(image, width, height, x, y, c.r, c.g, c.b, c.a, pixel_size);
 		}
 	}
 	return image;
 }
 
 // Writes a values array to a PNG files. The given parameter are values, so they are mapped to colors before being written to the PNG.
-void WriteImage(float* input, int width, int height, string filename, int pixel_size, float min_value, float max_value)
+void WriteImage(ColorSchema *schema, float* input, int width, int height, string filename, int pixel_size, float min_value, float max_value)
 {
-	char *image = ImageFromValuesArray(input, width, height, pixel_size, min_value, max_value);
+    char *image = ImageFromValuesArray(schema, input, width, height, pixel_size, min_value, max_value);
 	WriteImage(image, width*pixel_size, height*pixel_size, filename);
 	delete(image);
 }
 
 // Writes a values array to a PNG files. The given parameter are values, so they are mapped to colors before being written to the PNG.
-void WriteImage(float* input, int width, int height, string filename, float min_value, float max_value)
+void WriteImage(ColorSchema *schema, float* input, int width, int height, string filename, float min_value, float max_value)
 {
-	char *image = ImageFromValuesArray(input, width, height, 1, min_value, max_value);
+    char *image = ImageFromValuesArray(schema, input, width, height, 1, min_value, max_value);
 	WriteImage(image, width, height, filename);
 	delete(image);
 }
