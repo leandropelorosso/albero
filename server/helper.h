@@ -72,7 +72,7 @@ This AnalogIndex will be used to retrieve the analog forecast from the observed 
 */
 struct AnalogIndex{
 public:
-	int time = 0; // The day (value between 1 and NTIME)
+    int time = 0; // The day (value between 1 and NTIME)
 	float mse = MAX_FLOAT;  // The mean squared error of the analog
 	int lat = 0;
 	int lon = 0;

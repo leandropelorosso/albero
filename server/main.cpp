@@ -157,14 +157,14 @@ string ProcessCommand(string cmd)
 			string analog_range_to = document["configuration"]["analog-range-to"].GetString();
 			string date = document["configuration"]["date"].GetString();
 			string leadtime = document["configuration"]["leadtime-from"].GetString();
-			string accumulation_range = document["configuration"]["accumulation-range"].GetString();
-			string accumulation_ranges_str = document["configuration"]["accumulation-ranges"].GetString();
+            string accumulation_range = document["configuration"]["accumulation-range"].GetString(); // for instance 24 hs
+            string accumulation_ranges_str = document["configuration"]["accumulation-ranges"].GetString(); // for instance 3 (for a total of 72 hs)
 			string analogs_amount = document["configuration"]["analogs-amount"].GetString();
 			albero2->N_ANALOGS_PER_LAT_LON = stoi(analogs_amount);
 			albero2->threshold_ranges.clear();
 
-			times_in_range = stoi(accumulation_range) / 6;
-			accumulation_ranges = stoi(accumulation_ranges_str);
+            times_in_range = stoi(accumulation_range) / 6; // how many times do we have in a range? Each time are 6 hours.
+            accumulation_ranges = stoi(accumulation_ranges_str); // for instance: 3
 			albero2->nAccumulationRanges = accumulation_ranges;
 
 			/*
@@ -190,7 +190,7 @@ string ProcessCommand(string cmd)
 			}
 
 
-			albero2->Initialize(stoi(date));
+            albero2->Initialize(stoi(date)*100);
 
 			return albero2->stats->ToJSON();
 		}
@@ -224,7 +224,7 @@ string ProcessCommand(string cmd)
 			int range_index = ::atoi(s_range_index.c_str());
 
             // obtenemos la fecha deseada si existe
-            int date = (albero2->current_date) * 100;
+            int date = (albero2->current_date);
             if(document.HasMember(("date"))){
                 string s_date = document["date"].GetString();
                 date = ::atoi(s_date.c_str());
@@ -321,7 +321,7 @@ string ProcessCommand(string cmd)
                   int range_index = ::atoi(s_range_index.c_str());
 
                   // obtenemos la fecha deseada si existe
-                  int current_date = (albero2->current_date) * 100;
+                  int current_date = (albero2->current_date);
                   int requested_date = current_date;
 
                   if(document.HasMember(("date"))){
@@ -338,13 +338,15 @@ string ProcessCommand(string cmd)
 
                   // Grabamos los valores interpolados
 
-                  float *forecast = NULL;
-                  if(current_date!=requested_date){
-                      int historical_forecast_index = albero2->historical_forecast_index_by_range_and_date[range_index][requested_date];
-                      forecast = &albero2->historic_forecast_by_range[range_index][historical_forecast_index];
-                  }else{
-                      forecast = albero2->current_forecast_by_range[range_index];
-                  }
+                  // Retrieve the forecast for the selected date [NLATxNLON]
+                  float* forecast = &albero2->forecasts->forecasts_by_range[range_index][albero2->forecasts->forecast_index[requested_date]];
+
+               //   if(current_date!=requested_date){
+                     // int historical_forecast_index = albero2->historical_forecast_index_by_range_and_date[range_index][requested_date];
+                      //forecast = &albero2->historic_forecast_by_range[range_index][historical_forecast_index];
+             //     }else{
+                   //   forecast = albero2->current_forecast_by_range[range_index];
+            //      }
 
                   float* interpolated_values = Interpolate8(forecast, (int)albero2->forecasts->NLON, (int)albero2->forecasts->NLAT,
                       albero2->forecasts->lats[0],
@@ -595,15 +597,15 @@ int main(int argc, char* argv[])
 	ObservationReader::Init();
 
 
-	PCT::SelectScale(-3, true);
+    //PCT::SelectScale(-3, true);
     PCT::numerical_forecast_schema->render_scale(10, 200, 0, 60, albero_images_path + "numerical_forecast_big_scale.png");
-	PCT::SelectScale(-3, false);
+    //PCT::SelectScale(-3, false);
     PCT::numerical_forecast_schema->render_scale(10, 152, 0, 60, albero_images_path + "numerical_forecast_small_scale.png");
-	PCT::SelectScale(3, false);
+    //PCT::SelectScale(3, false);
     PCT::bias_schema->render_scale(10, 152, -60, 60, albero_images_path + "bias_small_scale.png");
-	PCT::SelectScale(-6, true);
+    //PCT::SelectScale(-6, true);
     PCT::mse_schema->render_scale(10, 152, 0, 20, albero_images_path + "mse_big_scale.png");
-	PCT::SelectScale(-7, true);
+    //PCT::SelectScale(-7, true);
     PCT::probabilistic_forecast_schema->render_scale(10, 152, 0, 100, albero_images_path + "probabilistic_forecast_big_scale.png");
 
     cout << "[] Scales Rendered." << endl;

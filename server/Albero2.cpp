@@ -66,20 +66,6 @@ Albero2::~Albero2()
         delete(mean_square_error_map);
     }
 
-    if (this->current_forecast_by_range != NULL){
-        for (int i = 0; i<this->nAccumulationRanges; i++){
-            delete(current_forecast_by_range[i]);
-        }
-        delete(current_forecast_by_range);
-    }
-
-    if (this->historic_forecast_by_range != NULL) {
-        for (int i = 0; i < this->nAccumulationRanges; i++){
-            delete(historic_forecast_by_range[i]);
-        }
-        delete(historic_forecast_by_range);
-    }
-
     if (this->analogs != NULL) delete(analogs);
     if (this->stats != NULL) delete(stats);
 
@@ -94,203 +80,21 @@ int Albero2::ReadHistoricForecasts(int current_date){
         forecasts->Initialize(reforecast_file_path);
     }
 
-    // TODO ! IMPORTANT: IT SHOULD PROCESS THE DAYS AFTER THE DATE TOO, NOT ONLY THE ONES BEFORE
-    // THIS IS PRENTENDING WE HAVE INFORMATION ONLY UP TO THE DESIRED DATE
-    forecasts->NTIME = forecasts->GetDateIndex(current_date) +  1;
-    forecasts->NYEARS = (int)((float)forecasts->NTIME / 365.25f);
+    forecasts->Read(current_date, 24, 3); // TODO: This should come from configuration
 
     NFHOUR = (int)forecasts->NFHOUR;
     NLAT = (int)forecasts->NLAT;
     NLON = (int)forecasts->NLON;
     NTIME = (int)forecasts->NTIME;
-    NYEARS = (int)forecasts->NYEARS;
 
-    size_t const NDIMS = 4;
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // LEEMOS LA INFORMACION
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     size_t dev_analogs_size = NLAT * NLON * this->nAccumulationRanges * N_ANALOGS_PER_LAT_LON;
     analogs = new AnalogIndex[dev_analogs_size];
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // LEEMOS EL CURRENT FORECAST
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // What are we going to read from the netcdf.
-    size_t start[NDIMS], count[NDIMS];
-
-    count[0] = 1; // time
-    count[1] = NFHOUR; // hour
-    count[2] = NLAT; // lat
-    count[3] = NLON; // lon
-    start[0] = forecasts->GetDateIndex(current_date);
-    start[1] = 0;
-    start[2] = 0;
-    start[3] = 0;
-
-    cout << "Forecast for Date:" << forecasts->forecast_days[start[0]] << endl;
-
-    // Let's read the current forecast (the one on the NTIMEth day)
-    int retval;
-    float *current_forecast = new float[NFHOUR * NLAT * NLON];
-    if ((retval = nc_get_vara_float(forecasts->ncid, forecasts->precipitation_varid, start, count, current_forecast)))
-        ERR(retval);
-
-    cout << "1" << endl;
-
-    /*******************************************************************************/
-    // HERE WE ACCUMULATE THE VALUES OF THE RANGE FOR THE CURRENT FORECAST
-    /*******************************************************************************/
-
-
-    current_forecast_by_range = new float*[this->nAccumulationRanges];
-
-    // Now we can can accumulate the information for the range.
-    for (int range = 0; range < this->nAccumulationRanges; range++){
-
-        float min_value = MAX_FLOAT;
-        float max_value = 0;
-
-        // initialize the current forecast for the range
-        current_forecast_by_range[range] = new float[NLAT * NLON * this->nAccumulationRanges];
-        memset(current_forecast_by_range[range], 0, sizeof(float) * NLAT * NLON);
-
-        int hour_start = range * times_in_range + 1; // (remember, Total precipitation (kg m?2, i.e., mm) in last 6?h period (00, 06, 12, 18 UTC) or in last 3?h period(03, 09, 15, 21 UTC)[Y])
-        int hour_end = hour_start + times_in_range;
-
-        for (int hour = hour_start; hour < hour_end; hour ++ )
-        {
-            // get the start index for that hour in the forecast from the netcd
-            int current_original_index = (hour * NLAT * NLON);
-
-
-            for (int lat = 0; lat < NLAT; lat++){
-                for (int lon = 0; lon < NLON; lon++){
-
-                    int i = lat*NLON + lon;
-
-                    float value = current_forecast[current_original_index + i];
-
-                    /*
-                    value = 0;
-                    if (this->forecasts->lats[lat] == -35 && this->forecasts->lons[lon] == -59)	value = 10;
-                    if (this->forecasts->lats[lat] == -34 && this->forecasts->lons[lon] == -59)	value = 10;
-                    */
-
-                    current_forecast_by_range[range][i] += value;
-
-                    min_value = fminf(min_value, current_forecast_by_range[range][i]);
-                    max_value = fmaxf(max_value, current_forecast_by_range[range][i]);
-                }
-            }
-
-
-        }
-
-        // stats
-        stats->min_numerical_forecast[range] = min_value;
-        stats->max_numerical_forecast[range] = max_value;
-    }
-
-
-    delete(current_forecast);
-
-    cout << "2" << endl;
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // LEEMOS LOS HISTORIC FORECAST
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    count[0] = NTIME_WINDOW;
-    //float *historic_forecast = new float[NYEARS * NTIME_WINDOW * NFHOUR * NLAT * NLON];
-    float *historic_forecast = new float[NYEARS * NTIME_WINDOW * NFHOUR * NLAT * NLON];
-
-    for (int year = 0; year < NYEARS; year++) // we want 90 days of each year.
-    {
-        // read the 90 days window for the year.
-        start[0] = (size_t)(NTIME - (NYEARS - year)*365.25f - (NTIME_WINDOW/2));
-
-        cout << "Segment Date " << forecasts->forecast_days[start[0]] << " - " << forecasts->forecast_days[start[0]+NTIME_WINDOW] << endl;
-
-        if ((retval = nc_get_vara_float(forecasts->ncid, forecasts->precipitation_varid, start, count, &historic_forecast[year*NTIME_WINDOW*NFHOUR*NLAT*NLON])))
-            ERR(retval);
-    }
-
-    /*******************************************************************************/
-    // HERE WE ACCUMULATE THE VALUES OF THE RANGE FOR THE ANALOGS
-    /*******************************************************************************/
-
-    cout << "3" << endl;
-
-    historic_forecast_by_range = new float*[this->nAccumulationRanges];
-    historical_forecast_index_by_range_and_date = new map<int, long>[this->nAccumulationRanges];
-
-    cout << "4" << endl;
-
-    // Now we can can accumulate the information for the range.
-    for (int range = 0; range < this->nAccumulationRanges; range++){
-
-        historic_forecast_by_range[range] = new float[NYEARS * NTIME_WINDOW * NLAT * NLON];
-        memset(historic_forecast_by_range[range], 0, sizeof(float) * NYEARS * NTIME_WINDOW * NLAT * NLON);
-
-        // Iterate the days
-
-        for (int year = 0; year < NYEARS; year++)
-        {
-            for (int day = 0; day < NTIME_WINDOW; day++)
-            {
-                int hour_start = range * times_in_range + 1; // (remember, Total precipitation (kg m?2, i.e., mm) in last 6?h period (00, 06, 12, 18 UTC) or in last 3?h period(03, 09, 15, 21 UTC)[Y])
-                int hour_end = hour_start + times_in_range;
-
-                for (int hour = hour_start; hour < hour_end; hour ++)
-                {
-                    // get the start index for that hour in the forecast from the netcd
-                    int current_original_index = CPU_HISTORIC_FORECAST_INDEX(year, day, hour, 0, 0);
-                    // get the save index, the start of the lat lon of the day
-                    int save_index = (year * NTIME_WINDOW * NLAT * NLON) + day * NLAT * NLON ;
-
-
-                    /////////////////////
-                    // We are going to store the position at where the day starts on the historical forecast by range array.
-                    // so we can quickly retrieve historical forecast by range from the date.
-                    int day_label_index = (size_t)(NTIME - (NYEARS - year)*365.25f - (NTIME_WINDOW/2) + day);
-                    int date = forecasts->forecast_days[day_label_index];
-                    cout << "Date: " << date << " :: historical_index: " << save_index << endl;
-                    historical_forecast_index_by_range_and_date[range][date] = save_index;
-                    /////////////////////
-
-                    for (int lat = 0; lat < NLAT; lat++){
-                        for (int lon = 0; lon < NLON; lon++){
-
-                            int i = lat*NLON + lon;
-
-                            float value = historic_forecast[current_original_index + i];
-
-                            /*
-                            value = 0;
-                            if (year == 0 && day == 0){
-                                if (this->forecasts->lats[lat] == -35 && this->forecasts->lons[lon] == -59) value = 10;
-                                if (this->forecasts->lats[lat] == -34 && this->forecasts->lons[lon] == -59)	value = 10;
-                            }
-                            */
-
-                            historic_forecast_by_range[range][save_index + i] += value;
-                        }
-                    }
-                }
-
-            }
-        }
-
-    }
-
-    delete(historic_forecast);
-
-
-    return 0;
+    // TODO: READ AND GET STATS
+    //stats->min_numerical_forecast[range] = min_value;
+    //stats->max_numerical_forecast[range] = max_value;
 }
 
 
@@ -306,6 +110,9 @@ int Albero2::CalculateAnalogs(){
 
     // Foreach accumulation Range
     for (int accumulation_range = 0; accumulation_range< this->nAccumulationRanges; accumulation_range++){
+
+        // Retrieve the forecast for the selected date [NLATxNLON]
+        float* current_forecast = &this->forecasts->forecasts_by_range[accumulation_range][this->forecasts->forecast_index[this->current_date]];
 
         // for each latitud, longitud and fhour...
         for (int lat = 0; lat < NLAT; lat++){
@@ -324,102 +131,64 @@ int Albero2::CalculateAnalogs(){
 
                 AnalogIndex *maxAnalog = &local_analogs[0];
 
+                // now, for the current (lat,lon) point, we'll iterate the surounding points, for evey date on the time window
+                for (int date : forecasts->forecast_date)
+                {
+                    // get the historic forecast [NLATxNLON]
+                    // TODO: It is not necessary to use forecast_index here, it can be replaces by a simple calculation.
+                    float* historic_forecast = &this->forecasts->forecasts_by_range[accumulation_range][this->forecasts->forecast_index[date]];
 
-                // now, for the current (lat,lon) point, we'll iterate the surounding points, for evey year and window time
+                    // ... and calculate the MSE of the region suroinding the center block.
 
-                for (int year = 0; year < NYEARS; year++){
+                    float mse = 0;  // mse of the block
+                    int cells_in_block = 0;; // amount of cells on the block
 
-                    for (int time = 0; time < NTIME_WINDOW; time++){
+                    // iterate X as the longitud of the surounding points.
+                    for (int x = lon - ((int)ANALOG_DIMENSION / 2); x <= lon + ((int)ANALOG_DIMENSION / 2) + 1; x++){ // lon
 
-                        int date = forecasts->forecast_days[(int)(NTIME - (NYEARS - year)*365.25f - 45) + time];
+                        if (x < 0) continue;
+                        if (x >= NLON) continue;
 
-                        // ... and calculate the MSE of the region suroinding the center block.
+                        // iterate Y as the latitude of the surounding points.
+                        for (int y = lat - ((int)ANALOG_DIMENSION / 2)-1; y <= lat + ((int)ANALOG_DIMENSION / 2); y++){ // lat
 
-                        float mse = 0;  // mse of the block
-                        int cells_in_block = 0;; // amount of cells on the block
+                            if (y < 0) continue;
+                            if (y >= NLAT) continue;
 
+                            float current_mean = current_forecast[y*NLON + x];
+                            float historic_mean = historic_forecast[y*NLON + x];
 
+                            mse += ((current_mean - historic_mean) * (current_mean - historic_mean));
+                            cells_in_block++;
 
-                        /*****************************************************
-                        /***** DEBUG **************************************/
-
-                        float point_lat = forecasts->lats[lat];
-                        float point_lon = forecasts->lons[lon];
-
-                        int start_x = lon - ((int)ANALOG_DIMENSION / 2);
-                        int end_x = lon + ((int)ANALOG_DIMENSION / 2) + 1;
-
-                        int start_y = lat - ((int)ANALOG_DIMENSION / 2) - 1;
-                        int end_y = lat + ((int)ANALOG_DIMENSION / 2);
-
-                    /*	if (point_lat == -34 && point_lon == -59){
-                            cout << "found" << endl;
-                        }
-                        */
-                        /******************************************************/
-
-
-                        // iterate X as the longitud of the surounding points.
-                        for (int x = lon - ((int)ANALOG_DIMENSION / 2); x <= lon + ((int)ANALOG_DIMENSION / 2) + 1; x++){ // lon
-
-                            if (x < 0) continue;
-                            if (x >= NLON) continue;
-
-                            // iterate Y as the latitude of the surounding points.
-                            for (int y = lat - ((int)ANALOG_DIMENSION / 2)-1; y <= lat + ((int)ANALOG_DIMENSION / 2); y++){ // lat
-
-                                if (y < 0) continue;
-                                if (y >= NLAT) continue;
-
-                                //---------------------------------------------------------------------------
-
-                                float current_mean = current_forecast_by_range[accumulation_range][y*NLON + x];
-
-                                float historic_mean = this->historic_forecast_by_range[accumulation_range][year * NTIME_WINDOW*NLAT*NLON + (time * NLAT * NLON) + (y * NLON) + x];
-
-                                //---------------------------------------------------------------------------
-
-                                mse += ((current_mean - historic_mean) * (current_mean - historic_mean));
-                                cells_in_block++;
-
-                            }
-                        }
-
-                        if (cells_in_block > 0){
-                            mse = mse / cells_in_block;
-                            mse = sqrtf(mse);
-
-                            // find the analog with highest mse
-                            for (int i = 0; i < N_ANALOGS_PER_LAT_LON; i++){
-                                if (local_analogs[i].mse == MAX_FLOAT){
-                                    maxAnalog = &local_analogs[i];
-                                    break;
-                                }
-
-                                if (local_analogs[i].mse > maxAnalog->mse){
-                                    maxAnalog = &local_analogs[i];
-                                }
-                            }
-
-                            // if the analog with highest mse is higher than the mse of the parameter, update.
-                            if (maxAnalog->mse > mse){
-                                maxAnalog->mse = mse;
-                                maxAnalog->time = time;
-                                maxAnalog->year = year;
-                                maxAnalog->lat = lat;
-                                maxAnalog->lon = lon;
-                                maxAnalog->date = date;
-
-                                /*if (point_lat == -34 && point_lon == -59){
-                                    std::cout << "date: " <<  date << endl;
-                                }
-                                */
-
-
-
-                            }
                         }
                     }
+
+                    if (cells_in_block > 0){
+                        mse = mse / cells_in_block;
+                        mse = sqrtf(mse);
+
+                        // find the analog with highest mse
+                        for (int i = 0; i < N_ANALOGS_PER_LAT_LON; i++){
+                            if (local_analogs[i].mse == MAX_FLOAT){
+                                maxAnalog = &local_analogs[i];
+                                break;
+                            }
+
+                            if (local_analogs[i].mse > maxAnalog->mse){
+                                maxAnalog = &local_analogs[i];
+                            }
+                        }
+
+                        // if the analog with highest mse is higher than the mse of the parameter, update.
+                        if (maxAnalog->mse > mse){
+                            maxAnalog->mse = mse;
+                            maxAnalog->lat = lat;
+                            maxAnalog->lon = lon;
+                            maxAnalog->date = date;
+                        }
+                    }
+
                 }
             }
         }
@@ -449,8 +218,6 @@ int Albero2::CalculateAnalogs(){
 
                 max_mse = fmaxf(max_mse, avg_mse);
                 min_mse = fminf(min_mse, avg_mse);
-
-//				cout << lat << " " << lon << " " << this->mean_square_error_map[fhour][(NLAT-lat-1)*NLON + lon] << endl;
             }
         }
 
@@ -467,6 +234,9 @@ int Albero2::CalculateAnalogs(){
 
 RegionForecastCollection* Albero2::GetCurrentForecast(float lat, float lon, int accumulation_range)
 {
+    // Retrieve the forecast for the selected date [NLATxNLON]
+    float* current_forecast = &this->forecasts->forecasts_by_range[accumulation_range][this->forecasts->forecast_index[this->current_date]];
+
     // get the lat and lon index for the upper left corner of the desired region.
 
     // get the lat lon index of the specified coordinate
@@ -501,7 +271,7 @@ RegionForecastCollection* Albero2::GetCurrentForecast(float lat, float lon, int 
             if (iy < 0) continue;
             if (iy >= NLAT) continue;
 
-            float value = current_forecast_by_range[accumulation_range][ (iy * NLON) + ix];
+            float value = current_forecast[ (iy * NLON) + ix];
 
             // assign the value
             values[y*(ANALOG_DIMENSION + 1) + x] = value;
@@ -690,6 +460,10 @@ RegionForecastCollection* Albero2::GetAnalogForecasts(float lat, float lon, int 
 
         int date = local_analogs[analog_index].date;
 
+        // Retrieve the forecast for the analog date [NLATxNLON]
+        float* forecast = &this->forecasts->forecasts_by_range[accumulation_range][this->forecasts->forecast_index[date]];
+
+
         // define the values array
         float* values = new float[(ANALOG_DIMENSION + 1)*(ANALOG_DIMENSION + 1)];
 
@@ -709,7 +483,7 @@ RegionForecastCollection* Albero2::GetAnalogForecasts(float lat, float lon, int 
                 if (iy < 0) continue;
                 if (iy >= NLAT) continue;
 
-                float value = this->historic_forecast_by_range[accumulation_range][local_analogs[analog_index].year * NTIME_WINDOW*NLAT*NLON + (local_analogs[analog_index].time * NLAT * NLON) + (iy * NLON) + ix];
+                float value = forecast[iy * NLON + ix];
 
                 // assign the value
                 values[y*(ANALOG_DIMENSION + 1) + x] = value; // store value for this particular analog
@@ -1172,7 +946,7 @@ int Albero2::CalculateProbabilisticForecast(){
 
 
             /************ DEBUG TESTING ***/
-
+/*
             float init_lat = forecasts->lats[0];
             float init_lon = forecasts->lons[0];
 
@@ -1197,20 +971,20 @@ int Albero2::CalculateProbabilisticForecast(){
                     if (y == 0 && x ==00){
                         probability_map[probability_map_index][y * probability_map_width + x] = 100;
                     }
-                    /*else{
-                        probability_map[probability_map_index][y * probability_map_width + x] = 0;
-                    }*/
+                    //else{
+                    //    probability_map[probability_map_index][y * probability_map_width + x] = 0;
+                    //}
 
-                /*	if (int(lat) == -33 && int(lon) == -60){
-                        probability_map[probability_map_index][y * probability_map_width + x] = 100;
-                        //						cout << "lon_index : lat_index : global_x : global_y =" << lon_index << ":" << lat_index << ":" << x << " : " << y << endl;
-                    }
-                    else{
-                        probability_map[probability_map_index][y * probability_map_width + x] = 0;
-                    }*/
+                //	if (int(lat) == -33 && int(lon) == -60){
+                //      probability_map[probability_map_index][y * probability_map_width + x] = 100;
+                //        //						cout << "lon_index : lat_index : global_x : global_y =" << lon_index << ":" << lat_index << ":" << x << " : " << y << endl;
+                //    }
+                //    else{
+                //        probability_map[probability_map_index][y * probability_map_width + x] = 0;
+                //    }
                 }
             }
-            /************ DEBUG TESTING ***/
+            ************ DEBUG TESTING ***/
 
 
 
@@ -1253,8 +1027,8 @@ int Albero2::Initialize(int current_date)
     if (this->forecasts != NULL) delete(forecasts); forecasts = NULL;
     if (this->probability_map != NULL) delete(probability_map); probability_map = NULL;
     if (this->mean_square_error_map != NULL) delete(mean_square_error_map); mean_square_error_map = NULL;
-    if (this->current_forecast_by_range != NULL) delete(current_forecast_by_range); current_forecast_by_range = NULL;
-    if (this->historic_forecast_by_range != NULL) delete(historic_forecast_by_range); historic_forecast_by_range = NULL;
+    //if (this->current_forecast_by_range != NULL) delete(current_forecast_by_range); current_forecast_by_range = NULL;
+    //if (this->historic_forecast_by_range != NULL) delete(historic_forecast_by_range); historic_forecast_by_range = NULL;
     if (this->analogs != NULL) delete(analogs); analogs = NULL;
     if (this->stats!= NULL) delete(stats); stats = NULL;
 
