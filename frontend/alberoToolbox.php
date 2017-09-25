@@ -16,6 +16,6 @@
 		</ul>
 	</div>
 	<div style="margin-top:10px;">
-		<a style="color: cornflowerblue;" target="_BLANK" href='/resources.php'>Resources</a>
+		<a style="color: cornflowerblue;" target="_BLANK" href="http://github.com/leandropelorosso/albero/">Fork on Github</a>
 	</div>
 </div>	

@@ -10,8 +10,14 @@ ini_set('max_execution_time', 300); //300 seconds = 5 minutes
 
 //$request_body = file_get_contents('php://input');
 
+if($request_body['action']=='stop_server'){
+	exec( 'pkill albero');
+	echo( 'done' );	
+	return;
+}
+
 /* Get the port for the WWW service. */
-$service_port = 1101;
+$service_port = 1105;
 
 /* Get the IP address for the target host. */
 $address = gethostbyname('localhost');
@@ -25,12 +31,17 @@ if ($socket === false) {
 }
 
 //echo "Attempting to connect to '$address' on port '$service_port'...";
-$result = socket_connect($socket, $address, $service_port);
-if ($result === false) {
-    echo "socket_connect() failed.\nReason: ($result) " . socket_strerror(socket_last_error($socket)) . "\n";
-} else {
 
-}
+	$result = socket_connect($socket, $address, $service_port);
+	if ($result === false) {
+
+			echo "socket_connect() failed.\nReason: ($result) " . socket_strerror(socket_last_error($socket)) . "\n";
+			return;		
+
+	
+	} else {
+		
+	}
 
 
 $in = json_encode($request_body);
@@ -47,6 +58,11 @@ while ($out = socket_read($socket, 65535)) {
 // open the file in a binary mode
 switch($request_body['action'])
 {
+
+	case "stop_server":
+		exec("pkill albero");
+	break;
+
 	// -----------------------------------------------------
 	// GET FORECAST (probabilistic)
 	// GET CURRENT FORECAST (current numerical forecast)

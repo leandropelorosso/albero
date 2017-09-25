@@ -13,7 +13,7 @@
 
 <div class="noselect" id="alberoMipmapDialog" title="Übermap (04/01/2013)">
 
-<div style="padding-right:100px;">
+<div style="margin-right:100px; min-width: 115px; max-width: 420px; padding-bottom: 10px; margin-bottom:20px; overflow-x: auto;">
 	<table>
 		<thead>
 			<tr id="ubermap-header" style="height:40px;">

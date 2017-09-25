@@ -14,6 +14,18 @@ $(document).ready(function(){
 		}
 	}
 
+	$('body').on('click', '#alberoAnalogViewer .analog_observation', function (event) {
+		var column = $(this).closest(".analog-column");
+		var date = $(column).attr("date");
+		LoadLayer(map, albero_selected_range, -2, date); //range_index, threshold_index
+	});
+
+	$('body').on('click', '#alberoAnalogViewer .analog_forecast', function (event) {
+		var column = $(this).closest(".analog-column");
+		var date = $(column).attr("date");
+		LoadLayer(map, albero_selected_range, -4, date); //range_index, threshold_index
+	});
+
 });
 
 // displays the max and min value on the scale (the color scale next to the regions)

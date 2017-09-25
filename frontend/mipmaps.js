@@ -47,7 +47,7 @@ function OpenUberMap(){
 		Albero.configuration["threshold-ranges"].forEach(function(threshold) {
 
 			var tr = $("<tr></tr>");
-			var td = $("<td>" + threshold +" mm</td>");
+			var td = $("<td>&ge; " + threshold +" mm</td>");
 			var e = tr.append(td);
 
 			// For each accumulation range
@@ -62,7 +62,7 @@ function OpenUberMap(){
 		// DISPLAY OTHER VISUALIZATION OPTIONS FOR THE COLUMN
 
 		// FORECAST
-		var tr = $("<tr><td></td></tr>");
+		var tr = $("<tr><td class='small'></td></tr>");
 		for(var accumulation_range_index = 0; accumulation_range_index < Albero.configuration["accumulation-ranges"]; accumulation_range_index++){
 				var td = $("<td class='threshold_map_selector label' threshold_index='-4' range_index='"+accumulation_range_index+"'><p>Forecast</p></td>")
 				tr.append(td);
@@ -71,7 +71,7 @@ function OpenUberMap(){
 
 
 		// OBSERVED
-		var tr = $("<tr><td></td></tr>");
+		var tr = $("<tr><td class='small'></td></tr>");
 		for(var accumulation_range_index = 0; accumulation_range_index < Albero.configuration["accumulation-ranges"]; accumulation_range_index++){
 				var td = $("<td class='threshold_map_selector label' threshold_index='-2' range_index='"+accumulation_range_index+"'><p>Observed</p></td>")
 				tr.append(td);
@@ -80,7 +80,7 @@ function OpenUberMap(){
 
 
 		// MSE
-		var tr = $("<tr><td></td></tr>");
+		var tr = $("<tr><td class='small'></td></tr>");
 		for(var accumulation_range_index = 0; accumulation_range_index < Albero.configuration["accumulation-ranges"]; accumulation_range_index++){
 				var td = $("<td class='threshold_map_selector label' threshold_index='-3' range_index='"+accumulation_range_index+"'><p>MSE</p></td>")
 				tr.append(td);

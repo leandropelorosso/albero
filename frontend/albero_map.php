@@ -3,7 +3,7 @@
    <head>
 	<title></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<script type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+	<script type="text/javascript" src="https://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0&s=1"></script>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" href="alberoToolbox.css">
 	<link rel="stylesheet" href="alberoConfigurationBox.css">
@@ -22,7 +22,7 @@
 	<link rel="stylesheet" type="text/css" href="/ThirdParty/jquery.loadmask.css">
 	<link rel="stylesheet" type="text/css" href="/ThirdParty/elessar.css">
 	<link rel="stylesheet" type="text/css" href="albero.css">
-	<script src="http://momentjs.com/downloads/moment.min.js"></script>
+	<script src="https://momentjs.com/downloads/moment.min.js"></script>
 	<script src="https://rawgithub.com/quarterto/Estira/master/index.js"></script>
 
 
@@ -354,7 +354,7 @@
 
 		// Create a polygon 
 		var vertices = new Array(location1, location2, location3, location4, location1);
-		var polygon = new Microsoft.Maps.Polygon(vertices,{fillColor: color,strokeThickness:0});
+		var polygon = new Microsoft.Maps.Polygon(vertices,{fillColor: new Microsoft.Maps.Color(0,0,0,0), strokeColor:new Microsoft.Maps.Color(255,0,0,0), strokeThickness:0.1});
 		return polygon;
 	}
 
@@ -432,10 +432,12 @@
 */
 
 
-	function LoadLayer(map, range_index, threshold_index)
+	function LoadLayer(map, range_index, threshold_index, date)
 	{	
-//		console.log(range_index);
-//		console.log(threshold_index);
+		console.log("--------------");
+		console.log(range_index);
+		console.log(threshold_index);
+		console.log(date);
 
 		var tilelayer = mapLayers[map.albero_id];
 		
@@ -454,7 +456,7 @@
            }
 
            // Construct the layer using the tile source
-           tilelayer= new Microsoft.Maps.TileLayer({ mercator: tileSource, opacity: .7 });
+           tilelayer= new Microsoft.Maps.TileLayer({ mercator: tileSource, opacity: 1, zIndex:2 });
 
            // Push the tile layer to the map
            map.entities.push(tilelayer);
@@ -469,14 +471,17 @@
         
          function getObservationTile(tile)
 		 {
+
+		 	var dateParameter = (date)? '&date=' + date : ''; 
+
 		 	if(threshold_index==-2) // OBSERVATIONS
-			 	return 'albero.php?action=get_observation&z=' + tile.levelOfDetail + '&x=' + tile.x + '&y=' + tile.y + '&threshold_index=' + threshold_index + '&range_index=' + range_index+ "&" + new Date().getTime();
+			 	return 'albero.php?action=get_observation&z=' + tile.levelOfDetail + '&x=' + tile.x + '&y=' + tile.y + '&threshold_index=' + threshold_index + '&range_index=' + range_index+ "&" + new Date().getTime() + dateParameter;
 
  		 	if(threshold_index==-3) // MSE
 			 	return 'albero.php?action=get_mse&z=' + tile.levelOfDetail + '&x=' + tile.x + '&y=' + tile.y + '&range_index=' + range_index+ "&" + new Date().getTime();
 
  		 	if(threshold_index==-4) // NUMERICAL FORECAST
-			 	return 'albero.php?action=get_num_forecast&z=' + tile.levelOfDetail + '&x=' + tile.x + '&y=' + tile.y + '&range_index=' + range_index+ "&" + new Date().getTime();
+			 	return 'albero.php?action=get_num_forecast&z=' + tile.levelOfDetail + '&x=' + tile.x + '&y=' + tile.y + '&range_index=' + range_index+ "&" + new Date().getTime() + dateParameter;
 
 		 }
 
@@ -523,15 +528,30 @@
 		map.selectionQuadEntities = new Microsoft.Maps.EntityCollection();
 		map.selectionQuadEntities.setOptions({visible:false,zIndex:-1});
 		map.entities.push(map.selectionQuadEntities);
-		/*
-		dragSelectionQuadEntities = new Microsoft.Maps.EntityCollection();
-		dragSelectionQuadEntities.setOptions({visible:true,zIndex:-2});
-		map.entities.push(dragSelectionQuadEntities);
-		*/
+	
 		map.clickedSelectionQuad = [];
 		map.selectionQuad = [];
 
     	GenerateGridLines(map);
+
+
+
+		var tileSource = new Microsoft.Maps.TileSource({ uriConstructor: getTilePath });
+		var tileSourceWhite = new Microsoft.Maps.TileSource({ uriConstructor: getTilePathWhite });
+		// Construct the layer using the tile source
+		var tilelayer = new Microsoft.Maps.TileLayer({ mercator: tileSource, opacity: 1, zIndex:3 });
+		var tilelayerWhite = new Microsoft.Maps.TileLayer({ mercator: tileSourceWhite, opacity: 1, zIndex:1 });
+		// Push the tile layer to the map
+		map.entities.push(tilelayerWhite);
+		map.entities.push(tilelayer);
+		function getTilePath(tile) {
+		 	//return "https://maps.wikimedia.org/osm-intl/" + tile.levelOfDetail + "/" + tile.x + "/" + tile.y + ".png";
+		 	return "http://127.0.0.1:20008/tile/test/" + tile.levelOfDetail + "/" + tile.x + "/" + tile.y + ".png" + "?" + new Date().getTime();;
+		}
+		function getTilePathWhite(tile) {
+			return "http://127.0.0.1:20008/tile/test-white-background/" + tile.levelOfDetail + "/" + tile.x + "/" + tile.y + ".png" + "?" + new Date().getTime();;
+		}
+
 
     	return map;
 	}
@@ -553,12 +573,13 @@
 
      function GenerateGridLines(map){
         var line;
+        var color = new Microsoft.Maps.Color(200, 50, 50, 50);
 
         //Draw vertical grid lines (Longitudes)
         for(var x = -180; x < 180; x+=0.25)
         {
         	if(Math.floor(x)==x){
-				line = new Microsoft.Maps.Polyline([new Microsoft.Maps.Location(-85, x), new Microsoft.Maps.Location(85, x)], {strokeColor:new Microsoft.Maps.Color(50, 100, 100, 100), strokeThickness:0.3});                               
+				line = new Microsoft.Maps.Polyline([new Microsoft.Maps.Location(-85, x), new Microsoft.Maps.Location(85, x)], {strokeColor:color, strokeThickness:0.1});                               
 				map.entities.push(line);
         	}
         }
@@ -566,19 +587,21 @@
         //Draw horizontal grid lines (Latitudes)
         //The wrap around effect in Bing Maps causes shapes that wide to sometimes loop around out of view. 
         //To prevent this we can break the lines into 4 segments. so that these grid lines aways stay in view
+
+
         for(var y = -85; y <= 85; y+=.25)
         {
         	if(Math.floor(y)==y){
-                line = new Microsoft.Maps.Polyline([new Microsoft.Maps.Location(y, -180),new Microsoft.Maps.Location(y, -90)], {strokeColor:new Microsoft.Maps.Color(50, 100, 100, 100), strokeThickness:0.3});
+                line = new Microsoft.Maps.Polyline([new Microsoft.Maps.Location(y, -180),new Microsoft.Maps.Location(y, -90)], {strokeColor:color, strokeThickness:0.1});
                 map.entities.push(line);
 
-                line = new Microsoft.Maps.Polyline([new Microsoft.Maps.Location(y, -90),new Microsoft.Maps.Location(y, 0)], {strokeColor:new Microsoft.Maps.Color(50, 100, 100, 100), strokeThickness:0.3});
+                line = new Microsoft.Maps.Polyline([new Microsoft.Maps.Location(y, -90),new Microsoft.Maps.Location(y, 0)], {strokeColor:color, strokeThickness:0.1});
                 map.entities.push(line);
 
-                line = new Microsoft.Maps.Polyline([new Microsoft.Maps.Location(y, 0),new Microsoft.Maps.Location(y, 90)], {strokeColor:new Microsoft.Maps.Color(50, 100, 100, 100), strokeThickness:0.3});
+                line = new Microsoft.Maps.Polyline([new Microsoft.Maps.Location(y, 0),new Microsoft.Maps.Location(y, 90)], {strokeColor:color, strokeThickness:0.1});
                 map.entities.push(line);
 
-                line = new Microsoft.Maps.Polyline([new Microsoft.Maps.Location(y, 90),new Microsoft.Maps.Location(y, 180)], {strokeColor:new Microsoft.Maps.Color(50, 100, 100, 100), strokeThickness:0.3});
+                line = new Microsoft.Maps.Polyline([new Microsoft.Maps.Location(y, 90),new Microsoft.Maps.Location(y, 180)], {strokeColor:color, strokeThickness:0.1});
                 map.entities.push(line);
         	}
         }

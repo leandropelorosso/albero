@@ -166,3 +166,9 @@
     height: 20px;
     margin-bottom: -3px;
 }
+
+#alberoAnalogViewer .analog_forecast_wrapper .analog_forecast,
+#alberoAnalogViewer .analog_forecast_wrapper .analog_observation{
+    cursor: pointer;
+}
+

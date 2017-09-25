@@ -76,8 +76,29 @@
     border: 2px solid orange;
 }
 
+#alberoMipmapDialog td{
+  
+}
+
+#alberoMipmapDialog{
+    padding-left: 74px;
+    overflow-y: hidden;
+}
+
+
 #alberoMipmapDialog td:first-child{
     border-right: 4.2px solid white;
+    position: absolute;
+    margin-left: -68px;
+    height: 83px;
+    padding-top: 70px;
+    width: 60px;
+    padding-left: 3px;
+}
+
+#alberoMipmapDialog td.small:first-child{
+    height: 19px;
+    padding-top: 0px;
 }
 
 #alberoMipmapDialog td:first-child.active{
