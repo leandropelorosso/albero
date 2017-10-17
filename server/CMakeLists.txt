@@ -7,8 +7,11 @@ project(albero)
 
 #file(GLOB SPINE_SRC "spine/*.c") # add spine sources
 file(GLOB MAIN_SRC "*.cpp") # add spine sources
+file(GLOB CMDS_SRC "commands/*.cpp") # add spine sources
+file(GLOB CMDS_HDR "commands/*.h") # add spine sources
 
-add_executable(albero ${MAIN_SRC})
+add_executable(albero ${MAIN_SRC} ${CMDS_SRC} ${CMDS_HDR})
 
 install(TARGETS albero RUNTIME DESTINATION bin)
 TARGET_LINK_LIBRARIES(albero netcdf IL pthread)
+
