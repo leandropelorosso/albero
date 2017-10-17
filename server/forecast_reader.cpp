@@ -1,4 +1,4 @@
-#include "ForecastReader.h"
+#include "forecast_reader.h"
 #include <stdio.h>
 #include <netcdf.h>
 #include "iostream"

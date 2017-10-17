@@ -13,13 +13,13 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/filestream.h"
 
-#include "PCT.h"
-#include "HCL.h"
-#include "Albero2.h"
-#include "ObservationReader.h"
-#include "Color.h"
-#include "Palette.h"
-#include "ColorSchema.h"
+#include "pct.h"
+#include "hcl.h"
+#include "albero2.h"
+#include "observation_reader.h"
+#include "color.h"
+#include "palette.h"
+#include "color_schema.h"
 #include "commands/command.h"
 
 #include <IL/il.h>

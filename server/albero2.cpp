@@ -1,5 +1,4 @@
-#include "Albero2.h"
-
+#include "albero2.h"
 #include <stdio.h>
 #include <netcdf.h>
 #include "iostream"
@@ -10,10 +9,10 @@
 #include <string>
 #include <iomanip>
 #include <math.h>
-#include "ObservationReader.h"
-#include "Color.h"
-#include "PCT.h"
-#include "ForecastReader.h"
+#include "observation_reader.h"
+#include "color.h"
+#include "pct.h"
+#include "forecast_reader.h"
 #include <string.h>
 #include <thread>
 

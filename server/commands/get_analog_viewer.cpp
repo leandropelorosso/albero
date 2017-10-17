@@ -4,9 +4,9 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/filestream.h"
-#include "../Albero2.h"
-#include "../ObservationReader.h"
-#include "../PCT.h"
+#include "../albero2.h"
+#include "../observation_reader.h"
+#include "../pct.h"
 
 extern string albero_images_path;
 

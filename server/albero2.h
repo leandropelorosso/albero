@@ -1,9 +1,9 @@
 #pragma once
 
 #include "helper.h"
-#include "ForecastReader.h"
+#include "forecast_reader.h"
 #include <list>
-#include "ColorSchema.h"
+#include "color_schema.h"
 #include "map"
 
 // When initializing Albero2 for a particular date, this struct will be filled and returned, 

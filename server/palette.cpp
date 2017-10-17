@@ -1,6 +1,6 @@
-#include "Palette.h"
+#include "palette.h"
 #include <string>
-#include "Color.h"
+#include "color.h"
 #include "math.h"
 #include <IL/il.h>
 

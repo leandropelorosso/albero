@@ -1,4 +1,4 @@
-#include "Color.h"
+#include "color.h"
 #include <math.h>  
 #include <fstream>  
 #include <stdio.h>  

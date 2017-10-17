@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Color.h"
+#include "color.h"
 #include "helper.h"
-#include "ColorSchema.h"
+#include "color_schema.h"
 
 
 // HCL Color schema

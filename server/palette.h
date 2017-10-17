@@ -6,8 +6,8 @@ A color palette, read from a png file.
 
 #include "stdio.h"
 #include <string>
-#include "Color.h"
-#include "ColorSchema.h"
+#include "color.h"
+#include "color_schema.h"
 
 class Palette : public ColorSchema
 {

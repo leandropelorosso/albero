@@ -1,7 +1,7 @@
 #include "command.h"
 #include <string>
 #include "rapidjson/document.h"
-#include "../Albero2.h"
+#include "../albero2.h"
 
 using namespace Commands;
 

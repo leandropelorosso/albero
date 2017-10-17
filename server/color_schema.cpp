@@ -1,5 +1,5 @@
-#include "Color.h"
-#include "ColorSchema.h"
+#include "color.h"
+#include "color_schema.h"
 #include "helper.h"
 #include "math.h"
 

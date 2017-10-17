@@ -1,4 +1,4 @@
-#include "HCL.h"
+#include "hcl.h"
 #include "math.h"
 #include "iostream"
 #include "helper.h"

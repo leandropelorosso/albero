@@ -1,5 +1,5 @@
-#include "PCT.h"
-#include "Color.h"
+#include "pct.h"
+#include "color.h"
 #include <math.h>
 #include "iostream"
 

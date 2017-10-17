@@ -1,7 +1,7 @@
 #ifndef COLORSCHEMA_H
 #define COLORSCHEMA_H
 
-#include "Color.h"
+#include "color.h"
 
 class ColorSchema{
 public:

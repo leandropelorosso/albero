@@ -3,7 +3,7 @@
 #undef min
 #include <iostream>  
 #include <limits>
-#include "ColorSchema.h"
+#include "color_schema.h"
 
 using namespace std;
 

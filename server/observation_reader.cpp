@@ -1,4 +1,4 @@
-#include "ObservationReader.h"
+#include "observation_reader.h"
 #include "helper.h"
 
 #include <netcdf.h>

@@ -1,6 +1,6 @@
 #pragma once
-#include "Color.h"
-#include "ColorSchema.h"
+#include "color.h"
+#include "color_schema.h"
 
 
 class PCT

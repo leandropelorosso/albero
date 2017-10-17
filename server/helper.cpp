@@ -7,10 +7,10 @@
 #include <string>     
 #include <iomanip>
 #include <assert.h> 
-#include "Color.h"
+#include "color.h"
 #include "helper.h"
-#include "PCT.h"
-#include "HCL.h"
+#include "pct.h"
+#include "hcl.h"
 #include "math.h"
 
 #include <IL/il.h>
