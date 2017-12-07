@@ -13,5 +13,5 @@ file(GLOB CMDS_HDR "commands/*.h") # add spine sources
 add_executable(albero ${MAIN_SRC} ${CMDS_SRC} ${CMDS_HDR})
 
 install(TARGETS albero RUNTIME DESTINATION bin)
-TARGET_LINK_LIBRARIES(albero netcdf IL pthread)
+TARGET_LINK_LIBRARIES(albero IL pthread netcdf netcdf_c++4)
 

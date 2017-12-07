@@ -24,6 +24,9 @@
 
 #include <IL/il.h>
 
+#include "forecast_importer.h"
+
+
 mutex queue_mutex;
 
 ColorSchema* PCT::numerical_forecast_schema;
@@ -207,6 +210,13 @@ void halt_handler(int s) {
 // Main
 int main(int argc, char* argv[])
 {
+    /*
+    ForecastImporter* imp = new ForecastImporter();
+    imp->Import("/home/vertexar/Downloads/netcdf_concat/2016032700.nc", "/home/vertexar/Downloads/netcdf_concat/reforecasts.nc");
+    delete(imp);
+    return 0;
+    */
+
 	if (argc != 4) {
 		cout << "Error, please specify parameters." << endl;
 		return 0;
