@@ -29,8 +29,8 @@ ForecastReader::ForecastReader()
 
 ForecastReader::~ForecastReader()
 {
-	delete(forecast_days);
-	delete(lats);
+    delete(forecast_days);
+    delete(lats);
     delete(lons);
     if(forecasts_by_range) {
         for(int i=0; i<this->accumulation_ranges;i++){
@@ -47,6 +47,7 @@ struct tm intToTMDate(string date){
     tm.tm_sec = 0;
     tm.tm_min = 0;
     tm.tm_hour = 0;
+    tm.tm_isdst = 0;
     return tm;
 }
 
@@ -56,77 +57,77 @@ int ForecastReader::Initialize(string filename){
     this->forecast_date.clear();
     this->forecast_index.clear();
 
-	/* Loop indexes, and error handling. */
-	int retval;
+    /* Loop indexes, and error handling. */
+    int retval;
 
-	/* Open the file. NC_NOWRITE tells netCDF we want read-only access
-	* to the file.*/
-	if ((retval = nc_open(filename.c_str(), NC_NOWRITE, &ncid)))
-		ERR(retval);
+    /* Open the file. NC_NOWRITE tells netCDF we want read-only access
+    * to the file.*/
+    if ((retval = nc_open(filename.c_str(), NC_NOWRITE, &ncid)))
+        ERR(retval);
 
-	/* Get the varids of the latitude and longitude coordinate
-	* variables. */
-	if ((retval = nc_inq_varid(ncid, LAT_NAME, &lat_varid)))
-		ERR(retval);
-	if ((retval = nc_inq_varid(ncid, LON_NAME, &lon_varid)))
-		ERR(retval);
-	if ((retval = nc_inq_varid(ncid, TIME_NAME, &time_varid)))
-		ERR(retval);
-	if ((retval = nc_inq_varid(ncid, PRECIPITATION_NAME, &precipitation_varid)))
-		ERR(retval);
-	if ((retval = nc_inq_varid(ncid, FHOUR_NAME, &fhour_varid)))
-		ERR(retval);
-	if ((retval = nc_inq_varid(ncid, INTTIME_NAME, &inttime_varid)))
-		ERR(retval);
+    /* Get the varids of the latitude and longitude coordinate
+    * variables. */
+    if ((retval = nc_inq_varid(ncid, LAT_NAME, &lat_varid)))
+        ERR(retval);
+    if ((retval = nc_inq_varid(ncid, LON_NAME, &lon_varid)))
+        ERR(retval);
+    if ((retval = nc_inq_varid(ncid, TIME_NAME, &time_varid)))
+        ERR(retval);
+    if ((retval = nc_inq_varid(ncid, PRECIPITATION_NAME, &precipitation_varid)))
+        ERR(retval);
+    if ((retval = nc_inq_varid(ncid, FHOUR_NAME, &fhour_varid)))
+        ERR(retval);
+    if ((retval = nc_inq_varid(ncid, INTTIME_NAME, &inttime_varid)))
+        ERR(retval);
 
-	/* Get the varids of the latitude and longitude coordinate
-	* dimensions. */
-	if ((retval = nc_inq_dimid(ncid, LAT_NAME, &lat_dimid)))
-		ERR(retval);
-	if ((retval = nc_inq_dimid(ncid, LON_NAME, &lon_dimid)))
-		ERR(retval);
-	if ((retval = nc_inq_dimid(ncid, TIME_NAME, &time_dimid)))
-		ERR(retval);
-	if ((retval = nc_inq_dimid(ncid, FHOUR_NAME, &fhour_dimid)))
-		ERR(retval);
+    /* Get the varids of the latitude and longitude coordinate
+    * dimensions. */
+    if ((retval = nc_inq_dimid(ncid, LAT_NAME, &lat_dimid)))
+        ERR(retval);
+    if ((retval = nc_inq_dimid(ncid, LON_NAME, &lon_dimid)))
+        ERR(retval);
+    if ((retval = nc_inq_dimid(ncid, TIME_NAME, &time_dimid)))
+        ERR(retval);
+    if ((retval = nc_inq_dimid(ncid, FHOUR_NAME, &fhour_dimid)))
+        ERR(retval);
 
-	/* Get the dimensions size */
-	nc_inq_dimlen(ncid, lat_dimid, &NLAT);
-	nc_inq_dimlen(ncid, lon_dimid, &NLON);
-	nc_inq_dimlen(ncid, time_dimid, &NTIME);
+    /* Get the dimensions size */
+    nc_inq_dimlen(ncid, lat_dimid, &NLAT);
+    nc_inq_dimlen(ncid, lon_dimid, &NLON);
+    nc_inq_dimlen(ncid, time_dimid, &NTIME);
     nc_inq_dimlen(ncid, fhour_dimid, &NFHOUR);
 
-	/* These program variables hold the latitudes and longitudes. */
-	lats = new float[NLAT];
-	lons = new float[NLON];
-	
-	/* dado un time del netcdf de reforecasts, devuelve un int con la fecha del día. */
-	forecast_days = new int[NTIME];
+    /* These program variables hold the latitudes and longitudes. */
+    lats = new float[NLAT];
+    lons = new float[NLON];
 
-	/* Read the coordinate variable data. */
-	if ((retval = nc_get_var_float(ncid, lat_varid, &lats[0])))
-		ERR(retval);
-	if ((retval = nc_get_var_float(ncid, lon_varid, &lons[0])))
-		ERR(retval);
-	/* Read forecast time */
-	if ((retval = nc_get_var_int(ncid, inttime_varid, forecast_days)))
-		ERR(retval);
+    /* dado un time del netcdf de reforecasts, devuelve un int con la fecha del d?a. */
+    forecast_days = new int[NTIME];
+
+    /* Read the coordinate variable data. */
+    if ((retval = nc_get_var_float(ncid, lat_varid, &lats[0])))
+        ERR(retval);
+    if ((retval = nc_get_var_float(ncid, lon_varid, &lons[0])))
+        ERR(retval);
+    /* Read forecast time */
+    if ((retval = nc_get_var_int(ncid, inttime_varid, forecast_days)))
+        ERR(retval);
 
     for (int i = 0; i < NLON; i++) lons[i] -= 360/*+0.125f*/;
 
-	return 1;
+    return 1;
 }
 
 // Returns the time index for a particular date.
 int ForecastReader::GetDateIndex(int date){
 
     date *= 100; // because dates end with 00 (for instance: 2002120800)
-	for (int i = (int)NTIME - 1; i >= 0; i--){
-		if (forecast_days[i] == date){
-			return i;
-		}
-	}
-	return -1;
+    for (int i = (int)NTIME - 1; i >= 0; i--){
+        if (forecast_days[i] == date){
+            return i;
+        }
+    }
+    return -1;
 }
 
 
@@ -187,7 +188,7 @@ int ForecastReader::Read(int date, int accumulation_range_hs, int accumulation_r
     // here we will retrieve a list of days indexes of days we will need to read from the netcdf.
     std::list<int> days;
 
-    for (int i = 0; i< (int)NTIME; i++){
+    for (int i = 0; i< (int)NTIME; i++){ // because we dont have all the observations yet
         // get the date as an int (for instance: 2012051000), and convert date to TM structure
         string local_date = to_string(forecast_days[i]);
         struct tm local_tm = intToTMDate(local_date);

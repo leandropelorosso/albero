@@ -23,7 +23,10 @@ std::string Initialize::Execute(Albero2* albero, rapidjson::Document& document){
 
     times_in_range = stoi(accumulation_range) / 6; // how many times do we have in a range? Each time are 6 hours.
     accumulation_ranges = stoi(accumulation_ranges_str); // for instance: 3
-    albero->nAccumulationRanges = accumulation_ranges;
+
+    albero->nAccumulationRanges = accumulation_ranges; // how many ranges
+    albero->accumulationRangeHs = stoi(accumulation_range); // length of the range in hs
+
 
     /*
     if (document["configuration"].HasMember("threshold-ranges")){

@@ -39,6 +39,9 @@ std::string Commands::GetNumericalForecast::Execute(Albero2* albero2, rapidjson:
     int end_lon_pixel = (x + 1) * 256;
 
     cout << "REQ>>NumForecast>> " << x << ", " << y << ", " << z << endl;
+    std::cout << "FECHA ES: " << requested_date << std::endl;
+    std::cout << "EN INDICE: " << albero2->forecasts->forecast_index[requested_date] << std::endl;
+
 
     // Grabamos los valores interpolados
 

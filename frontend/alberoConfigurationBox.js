@@ -173,8 +173,7 @@ function updateLeadTimeSelector(accumulation_range){
 	for(var lead_time = accumulation_range; lead_time <= 192; lead_time+=accumulation_range ){
 		   lead_time_selector.append($("<option></option>")
      		.attr("value",lead_time)
-     		.text(lead_time + " hs")); 
-		   console.log(lead_time);
+     		.text(lead_time + " hs")); 		  
 	}
 
 }

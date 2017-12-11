@@ -3,7 +3,7 @@
    <head>
 	<title></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<script type="text/javascript" src="https://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0&s=1"></script>
+	<script type="text/javascript" src="https://www.bing.com/api/maps/mapcontrol?callback=GetMap"></script>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" href="alberoToolbox.css">
 	<link rel="stylesheet" href="alberoConfigurationBox.css">
@@ -179,9 +179,9 @@
 		map.selectionQuadEntities.remove(map.clickedSelectionQuad[1]);
 
 		// generate new polygon for the clicked selector
-		map.clickedSelectionQuad[0] = generateSelectionQuad(ilatitude-0.5, ilongitude-0.5, 1.5, 1.5, new Microsoft.Maps.Color(40,0,255,0));						
-		map.clickedSelectionQuad[1] = generateSelectionQuad(ilatitude-0.5, ilongitude-0.5, 0.5, 0.5, new Microsoft.Maps.Color(40,0,255,0));						
-		
+		map.clickedSelectionQuad[0] = generateSelectionQuad(ilatitude-0.5, ilongitude-0.5, 1.5, 1.5, new Microsoft.Maps.Color(.2,0,255,0));
+		map.clickedSelectionQuad[1] = generateSelectionQuad(ilatitude-0.5, ilongitude-0.5, 0.5, 0.5, new Microsoft.Maps.Color(.2,0,255,0));		
+
 		// Add the shape to the map
 		map.selectionQuadEntities.push(map.clickedSelectionQuad[0]);					   			
 		map.selectionQuadEntities.push(map.clickedSelectionQuad[1]);					   			
@@ -190,14 +190,10 @@
 	// Mouse click callback
 	function onMouseClick(e) {
 	 	if (e.targetType == "map") {
+
 			var point = new Microsoft.Maps.Point(e.getX(), e.getY());
 			var locTemp = e.target.tryPixelToLocation(point);
-
-			// add the selected region rectangle
-			$.each(Maps, function( i, m ) {
-				AddSelectedRegion(m, locTemp);
-			});
-
+			
 			// execute all the subscribed events
 			for (var i = 0, len = onMouseClickEvents.length; i < len; i++) {
 				var fn = onMouseClickEvents[i];
@@ -205,41 +201,6 @@
 			}
 		}			
 	}
-	
-	// Mouse down callback: save cursor position
-	function onMouseDown(e) {
-	 	if (e.targetType == "map") {
-			var point = new Microsoft.Maps.Point(e.getX(), e.getY());
-			lastCursorPosition = e;
-			dragStartPosition = e;
-		}			
-	}	
-
-	// Mouse up callback: see if mouse has been moved since last mousedown event
-	function onMouseUp(e) {
-	 	if (e.targetType == "map") {
-			//var point = new Microsoft.Maps.Point(e.getX(), e.getY());
-			var cursorPosition = e;
-			if(Math.abs(lastCursorPosition.getX()-cursorPosition.getX())>0  || 
-			   Math.abs(lastCursorPosition.getY()-cursorPosition.getY())> 0) {
-				// the user dragged
-		
-				var ev = window.event;
-				// The user is pressing Ctrl, show the dragged selection
-				if (ev.ctrlKey) {
-					console.log('the user just dragged to select an area');
-					console.log("Lat, Long: " + draggedStartLatitude + ", " + draggedStartLongitude);
-					console.log("width, height: " + draggedAreaWidth + " " + draggedAreaHeight);
-				}
-				
-				
-			}
-			else // the user clicked
-			{
-				onMouseClick(e);
-			}
-		}			
-	}	
 	
 	function onMouseMove(e) {
 	
@@ -263,12 +224,13 @@
 			$("#labels #label_lat").text(locTemp.latitude.toFixed(2));
 			$("#labels #label_lon").text(locTemp.longitude.toFixed(2));
 
+			// we are not doing anything on mouse move if the selector if off.
+			if(!alberoToolbox.showHoverQuad) return;
+
 			// round the latitude and longitude
 			ilatitude = parseInt(locTemp.latitude);
 			ilongitude = parseInt(locTemp.longitude);
 
-			// console.log("("+locTemp.latitude + ", " + locTemp.longitude + ") = (" + ilatitude + ", " + ilongitude + ")");
-			
 			// if we need to update current position polygon's position
 			if(ilatitude != lastMouseLatitudeCell || ilongitude != lastMouseLongitudeCell)
 			{		
@@ -285,60 +247,13 @@
 						m.selectionQuadEntities.remove(m.selectionQuad[1]);
 					}
 					// generate new polygon
-					m.selectionQuad[0] = generateSelectionQuad(ilatitude-0.5, ilongitude-0.5, 1.5, 1.5, new Microsoft.Maps.Color(40,255,0,0));						
-					m.selectionQuad[1] = generateSelectionQuad(ilatitude-0.5, ilongitude-0.5, 0.5, 0.5, new Microsoft.Maps.Color(40,0,0,255));						
+					m.selectionQuad[0] = generateSelectionQuad(ilatitude-0.5, ilongitude-0.5, 1.5, 1.5, new Microsoft.Maps.Color(.2,255,0,0));						
+					m.selectionQuad[1] = generateSelectionQuad(ilatitude-0.5, ilongitude-0.5, 0.5, 0.5, new Microsoft.Maps.Color(.2,0,0,255));						
 					// Add the shape to the map
 					m.selectionQuadEntities.push(m.selectionQuad[0]);					   			
 					m.selectionQuadEntities.push(m.selectionQuad[1]);	
 
-				});
-
-				
-/*
-				
-				// The user is pressing Ctrl, show the dragged selection
-				if (ev.ctrlKey) {
-					e.handled = true;			
-					// calculate the size of the dragged area
-
-					var pointDragStartPosition = new Microsoft.Maps.Point(dragStartPosition.getX(), dragStartPosition.getY());
-					pointDragStartPosition = e.target.tryPixelToLocation(pointDragStartPosition);					
-									
-					var w = ilatitude - parseInt(pointDragStartPosition.latitude);
-					var h = ilongitude - parseInt(pointDragStartPosition.longitude);
-			 
-					 draggedAreaWidth = w;
-					 draggedAreaHeight = h;
-			 
-					 draggedStartLatitude = parseInt(pointDragStartPosition.latitude);
-					 draggedStartLongitude = parseInt(pointDragStartPosition.longitude);
-			 
-					// remove currently visible polygon
-					if(draggedSelectionQuad[0]!=null){
-						dragSelectionQuadEntities.remove(draggedSelectionQuad[0]);
-					}			 
-			 
-					// create the draggedSelectionQuad (it's an array but it's only one)		
-					draggedSelectionQuad[0] = generateDraggedSelectionQuad(draggedStartLatitude, draggedStartLongitude, w, h, new Microsoft.Maps.Color(40,255,0,0));						
-					dragSelectionQuadEntities.push(draggedSelectionQuad[0]);
-					
-					// create a push pin with a transparent image
-					// and the coordinates of the area
-					var pushpinOptions = {
-						icon: "data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",/* Transparent 1px x 1px gif with a 1bit palette, created with gimp and encoded with base64 tool in linux.
-						text: "(" + draggedStartLatitude + ", " + draggedStartLongitude + ") - (" + (draggedStartLatitude + draggedAreaWidth) + ", " + (draggedStartLongitude + draggedAreaHeight) + ")",
-						draggable: false,					
-						visible: true,
-						width: 200,
-						typeName: "labelPushpin"
-					};
-
-					if(labelPushpin!=null) map.entities.remove(labelPushpin);
-					labelPushpin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(draggedStartLatitude+draggedAreaWidth/2, draggedStartLongitude+draggedAreaHeight/2), pushpinOptions);					
-					map.entities.push(labelPushpin);
-						
-				}
-				*/
+				});				
 			}
 			
 	    }              
@@ -354,84 +269,10 @@
 
 		// Create a polygon 
 		var vertices = new Array(location1, location2, location3, location4, location1);
-		var polygon = new Microsoft.Maps.Polygon(vertices,{fillColor: new Microsoft.Maps.Color(0,0,0,0), strokeColor:new Microsoft.Maps.Color(255,0,0,0), strokeThickness:0.1});
-		return polygon;
-	}
-
-	function generateDraggedSelectionQuad(latitude, longitude, width, height, color)
-	{	
-		// Create the locations
-		var location1 = new Microsoft.Maps.Location(latitude,longitude);
-		var location2 = new Microsoft.Maps.Location(latitude+width,longitude);
-		var location3 = new Microsoft.Maps.Location(latitude+width,longitude+height);
-		var location4 = new Microsoft.Maps.Location(latitude,longitude+height);
-
-		// Create a polygon 
-		var vertices = new Array(location1, location2, location3, location4, location1);
-		var polygon = new Microsoft.Maps.Polygon(vertices,{fillColor: color,strokeThickness:0});
-		return polygon;
+		var polygon = new Microsoft.Maps.Polygon(vertices,{fillColor: color, strokeColor:new Microsoft.Maps.Color(.2,0,0,0), strokeThickness:0.1});
+		return polygon;		
 	}
 	
-	
-	
-	function submitAlberoRequest(request,success,failed){
-		$.ajax({
-    		url: "albero.php",
-			contentType: "application/json",
-			type: "POST",
-			data: JSON.stringify(request),
-			async:   true,
-			complete: function(data){
-				success(data)
-			},
-			error: function(data){
-				failed(data);
-			}
-		});
-	}
-
-
-/*
-	$("#apply_patterns").click(function(){
-		
-		OpenMessageBox("Processing", "Please wait while your request is being processed...");
-		
-		$.ajax({
-			//blah options
-			url: "process_patterns.php",
-			dataType: "json",
-			type: "POST",
-			data: JSON.stringify(setup),
-			async:   true,
-			complete: function(data){
-				
-				map.entities.remove(tilelayer);
-				
-				// Create the tile layer source
-				tileSource = new Microsoft.Maps.TileSource({uriConstructor: '/albero.php?q={quadkey}&t=' + new Date().getTime()});
-				// Construct the layer using the tile source
-				tilelayer= new Microsoft.Maps.TileLayer({ mercator: tileSource, opacity: .7 });
-				// Push the tile layer to the map
-				
-				map.entities.push(tilelayer);
-				
-				response = data.responseJSON[data.responseJSON.length-1];
-				
-				CloseMessageBox();
-				
-				if(response!="OK")
-				{
-					OpenMessageBox("Error", response);
-				}
-				
-			}//end success
-		});//end ajax
-	
-		
-	});
-*/
-
-
 	function LoadLayer(map, range_index, threshold_index, date)
 	{	
 		console.log("--------------");
@@ -444,7 +285,7 @@
 		try
         {
            
-           if (typeof tilelayer !== 'undefined') map.entities.remove(tilelayer);
+           if (typeof tilelayer !== 'undefined') map.layers.remove(tilelayer);
 
            if(threshold_index>=0)
            {
@@ -456,10 +297,10 @@
            }
 
            // Construct the layer using the tile source
-           tilelayer= new Microsoft.Maps.TileLayer({ mercator: tileSource, opacity: 1, zIndex:2 });
+           tilelayer= new Microsoft.Maps.TileLayer({ mercator: tileSource, opacity: 1 });
 
            // Push the tile layer to the map
-           map.entities.push(tilelayer);
+           map.layers.insert(tilelayer);
            mapLayers[map.albero_id] = tilelayer;
 
            
@@ -475,19 +316,19 @@
 		 	var dateParameter = (date)? '&date=' + date : ''; 
 
 		 	if(threshold_index==-2) // OBSERVATIONS
-			 	return 'albero.php?action=get_observation&z=' + tile.levelOfDetail + '&x=' + tile.x + '&y=' + tile.y + '&threshold_index=' + threshold_index + '&range_index=' + range_index+ "&" + new Date().getTime() + dateParameter;
+			 	return 'albero.php?action=get_observation&z=' + tile.zoom + '&x=' + tile.x + '&y=' + tile.y + '&threshold_index=' + threshold_index + '&range_index=' + range_index+ "&" + new Date().getTime() + dateParameter;
 
  		 	if(threshold_index==-3) // MSE
-			 	return 'albero.php?action=get_mse&z=' + tile.levelOfDetail + '&x=' + tile.x + '&y=' + tile.y + '&range_index=' + range_index+ "&" + new Date().getTime();
+			 	return 'albero.php?action=get_mse&z=' + tile.zoom + '&x=' + tile.x + '&y=' + tile.y + '&range_index=' + range_index+ "&" + new Date().getTime();
 
  		 	if(threshold_index==-4) // NUMERICAL FORECAST
-			 	return 'albero.php?action=get_num_forecast&z=' + tile.levelOfDetail + '&x=' + tile.x + '&y=' + tile.y + '&range_index=' + range_index+ "&" + new Date().getTime() + dateParameter;
+			 	return 'albero.php?action=get_num_forecast&z=' + tile.zoom + '&x=' + tile.x + '&y=' + tile.y + '&range_index=' + range_index+ "&" + new Date().getTime() + dateParameter;
 
 		 }
 
 		 function getTilePath(tile)
 		 {
-			 return 'albero.php?action=get_forecast&z=' + tile.levelOfDetail + '&x=' + tile.x + '&y=' + tile.y + '&threshold_index=' + threshold_index + '&range_index=' + range_index + "&" + new Date().getTime();
+			 return 'albero.php?action=get_forecast&z=' + tile.zoom + '&x=' + tile.x + '&y=' + tile.y + '&threshold_index=' + threshold_index + '&range_index=' + range_index + "&" + new Date().getTime();
 		 }
 	}
 
@@ -502,8 +343,10 @@
 		Microsoft.Maps.Events.addHandler(map, 'mousemove',onMouseMove );      
 
 		// this events are to see if the user dragged or clicked
-		Microsoft.Maps.Events.addHandler(map, 'mousedown',onMouseDown );      
-		Microsoft.Maps.Events.addHandler(map, 'mouseup', onMouseUp );      
+		//Microsoft.Maps.Events.addHandler(map, 'mousedown',onMouseDown );      
+		//Microsoft.Maps.Events.addHandler(map, 'mouseup', onMouseUp );      
+
+		Microsoft.Maps.Events.addHandler(map, 'click', onMouseClick );      
 	
 		// linked sub maps
 		map_sub = [];
@@ -514,13 +357,24 @@
        
        	// subscribe on mouse click event of the main map.
 		onMouseClickEvents.push(alberoUpdateMiniBingMaps);
+
+		InitMipmaps();
 		 
 	}
 
 	// Creates the map and assigns entities and grids
 	function SetupMap(map_div_id, albero_id){
 		 // Initialize the map
-        var map = new Microsoft.Maps.Map(document.getElementById(map_div_id),{credentials:"AhvmYWAXOIhP2nFNIZE8QoT8JmMVY0AIAW2SqfE_wz22SDhr1l0TmUdpFqA8fkDv", center:new Microsoft.Maps.Location(-38.5,-65), zoom:5, mapTypeId: Microsoft.Maps.MapTypeId.road }); 
+        var map = new Microsoft.Maps.Map(document.getElementById(map_div_id),{
+        	credentials:"AhvmYWAXOIhP2nFNIZE8QoT8JmMVY0AIAW2SqfE_wz22SDhr1l0TmUdpFqA8fkDv", 
+        	center:new Microsoft.Maps.Location(-38.5,-65), 
+        	zoom:5, 
+        	mapTypeId: Microsoft.Maps.MapTypeId.road,
+        	showDashboard: false,
+        	labelOverlay: Microsoft.Maps.LabelOverlay.hidden,
+        	showMapLabels: false,
+        	allowHidingLabelsOfRoad: true,
+        	showCopyright: false }); 
 
         map.albero_id = albero_id;
 
@@ -534,7 +388,7 @@
 
     	GenerateGridLines(map);
 
-
+/*
 
 		var tileSource = new Microsoft.Maps.TileSource({ uriConstructor: getTilePath });
 		var tileSourceWhite = new Microsoft.Maps.TileSource({ uriConstructor: getTilePathWhite });
@@ -552,7 +406,7 @@
 			return "http://127.0.0.1:20008/tile/test-white-background/" + tile.levelOfDetail + "/" + tile.x + "/" + tile.y + ".png" + "?" + new Date().getTime();;
 		}
 
-
+*/
     	return map;
 	}
 
@@ -565,21 +419,15 @@
 	}
 
 
-
-    GetMap();
-     //LoadLayer(map,0,0);
-
-
-
-     function GenerateGridLines(map){
+    function GenerateGridLines(map){
         var line;
-        var color = new Microsoft.Maps.Color(200, 50, 50, 50);
+        var color = new Microsoft.Maps.Color(.1, 255, 0, 255);
 
         //Draw vertical grid lines (Longitudes)
         for(var x = -180; x < 180; x+=0.25)
         {
         	if(Math.floor(x)==x){
-				line = new Microsoft.Maps.Polyline([new Microsoft.Maps.Location(-85, x), new Microsoft.Maps.Location(85, x)], {strokeColor:color, strokeThickness:0.1});                               
+				line = new Microsoft.Maps.Polyline([new Microsoft.Maps.Location(-85, x), new Microsoft.Maps.Location(85, x)], {strokeColor:color, strokeThickness:0.1});
 				map.entities.push(line);
         	}
         }
@@ -608,10 +456,25 @@
      }
 
 
+	function submitAlberoGetRequest(request,success,failure){
+	
+		$.ajax({
+		  method: "GET",
+		  dataType: "json",
+		  url: "albero.php",
+		  data: request
+		})
+		.done(function( data ) {
+			success(data);		
+		})
+		.fail(function( data ) {
+			failure(data);		
+		});
+	}
 
 
 
-	// First, checks if it isn't implemented yet.
+	// This implements string.format.  First, checks if it isn't implemented yet.
 	if (!String.prototype.format) {
 	  String.prototype.format = function() {
 	    var args = arguments;
@@ -624,6 +487,30 @@
 	  };
 	}
 
+
+	// Retrieves the available dates and initializes the selector on the configuration box.
+	var availableDates = [];
+	$(document).ready(function(){
+		
+	    submitAlberoGetRequest(
+	    	{ action: "get_available_days" }, 
+	    	function(data){ // success
+	    		availableDates = data;
+				$('#current-forecast-date').datepicker({ beforeShowDay: available });
+				console.log(availableDates);				
+	    	},
+	    	function(data){ // fail
+		    });
+	});
+
+	function available(date) {
+		var formattedDate = moment(date).format('YYYYMMDD00');  
+		if ($.inArray(formattedDate, availableDates) != -1) {
+			return [true, "","Available"];
+		} else {
+			return [false,"","unAvailable"];
+		}
+	}
 
 
 </script>

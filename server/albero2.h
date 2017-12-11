@@ -17,6 +17,7 @@ public:
 	float* min_mse, *max_mse; // mse in accumulation ranges
 	float* min_probabilistic_forecast, *max_probabilistic_forecast; // probabilistic forecasts in acculumation ranges
 	float* min_observation, *max_observation; // observations in accumulation ranges
+    bool current_date_has_observations; // if the current date has observations
 	int accumulation_ranges;
 	Statistics(int accumulation_ranges);
 	~Statistics();
@@ -64,7 +65,8 @@ public:
 	// Renders the ANALOGS block of ANALOG_DIMENSION panels surounding the desired (lat, lon) block.
 	AnalogsResponse* RenderAnalogForecasts(float lat, float lon, int fhour);
 	
-	int nAccumulationRanges; // amount of accumulation ranges, for now, of 24 hours.
+    int nAccumulationRanges; // amount of accumulation ranges
+    int accumulationRangeHs; // length in hours of the accumulation range
 	
 	int current_date;
 

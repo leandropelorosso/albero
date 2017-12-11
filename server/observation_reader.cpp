@@ -387,6 +387,12 @@ void ObservationReader::Dispose(){
 	cout << " OK" << endl;
 }
 
+// returns true if the date exists in the observations collection
+bool ObservationReader::HasDate(int date){
+    std::unordered_map<int,size_t>::const_iterator got = days_index_in_file.find (date/100);
+    return ( got != days_index_in_file.end());
+}
+
 float* ObservationReader::ReadRangeFromFile(int date, size_t start[], size_t count[], int range_index)
 {
 	// amount of (6 hour) slots per range, for instance:
@@ -404,7 +410,18 @@ float* ObservationReader::ReadRangeFromFile(int date, size_t start[], size_t cou
 	float* lon_hours = new float[count[2] * times_per_day];  // the "units in range" for each of the required longitudes in one latitude (read from file)
 
 	// lets get the start of the day in the file
-	size_t date_index = ((size_t)days_index_in_file[date / 100]) / sizeof(float);
+    size_t date_index = 0;
+
+    std::unordered_map<int,size_t>::const_iterator got = days_index_in_file.find (date/100);
+
+     if ( got == days_index_in_file.end() )
+       std::cout << date/100 <<  " not found";
+     else
+        date_index = ((size_t)got->second) / sizeof(float);
+
+//     size_t date_index = ((size_t)days_index_in_file[date / 100]) / sizeof(float);
+
+
 
 	// Iterate the exact times we need for the required range
 	for (int time = range_index*times_in_range; time < (range_index+1)*times_in_range; time++)

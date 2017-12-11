@@ -102,6 +102,7 @@ Commands::Command* cmd_get_numerical_forecast = new Commands::GetNumericalForeca
 Commands::Command* cmd_get_mse = new Commands::GetMSE();
 Commands::Command* cmd_get_analog_viewer = new Commands::GetAnalogViewer();
 Commands::Command* cmd_initialize = new Commands::Initialize();
+Commands::Command* cmd_get_available_days = new Commands::GetAvailableDays();
 
 // Process a given command
 string ProcessCommand(string cmd_json)
@@ -124,7 +125,7 @@ string ProcessCommand(string cmd_json)
 		cout << command << endl;
 
 		// ignore all actions if we are not initialized, except initialize.
-		if (!albero2->initialized && command != "initialize" && command != "ping") { cout << "Initialize First!" << endl; return "NO"; }
+        if (!albero2->initialized && command != "initialize" && command != "ping" && command != "get_available_days") { cout << "Initialize First!" << endl; return "NO"; }
 
         // INITIALIZE
 		if (command == "initialize")
@@ -156,6 +157,8 @@ string ProcessCommand(string cmd_json)
 		// GET ANALOG VIEWER
         if (command == "get_analog_viewer") return cmd_get_analog_viewer->Execute(albero2, document);
 
+        // GET ANALOG VIEWER
+        if (command == "get_available_days") return cmd_get_available_days->Execute(albero2, document);
 	}
 
     // return a default empty response
@@ -176,8 +179,8 @@ void ProcessQueue() {
 			queue_mutex.unlock();
 			
 			cout << theRequest.request_json << endl;
-			string result = ProcessCommand(theRequest.request_json.c_str());
-			if (result == "") result = "NO_RESPONSE";
+            string result = ProcessCommand(theRequest.request_json.c_str()) + "\n";
+            if (result == "") result = "NO_RESPONSE\n";
 
 			size_t bytecount = 0;
 			if (write(theRequest.csock, result.c_str(), (int)result.length()) <= 0) {
@@ -210,14 +213,14 @@ void halt_handler(int s) {
 // Main
 int main(int argc, char* argv[])
 {
-    /*
-    ForecastImporter* imp = new ForecastImporter();
-    imp->Import("/home/vertexar/Downloads/netcdf_concat/2016032700.nc", "/home/vertexar/Downloads/netcdf_concat/reforecasts.nc");
+
+ /*   ForecastImporter* imp = new ForecastImporter();
+    imp->Import("/home/vertexar/Downloads/netcdf_concat/2017120900.nc", "/home/vertexar/Downloads/netcdf_concat/reforecasts.nc");
     delete(imp);
     return 0;
-    */
+*/
 
-	if (argc != 4) {
+    if (argc != 4) {
 		cout << "Error, please specify parameters." << endl;
 		return 0;
 	}

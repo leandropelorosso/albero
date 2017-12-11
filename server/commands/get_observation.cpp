@@ -31,6 +31,8 @@ std::string Commands::GetObservation::Execute(Albero2* albero2, rapidjson::Docum
         date = ::atoi(s_date.c_str());
     }
 
+    std::cout << "FECHA ES: " << date << std::endl;
+
     int init_lat_pixel = (y + 1) * 256;
     int end_lat_pixel = y * 256;
     int init_lon_pixel = x * 256;

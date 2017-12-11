@@ -9,7 +9,7 @@ $(document).ready(function(){
 
 		// display or hide the selector
 		$.each(Maps, function( i, m ) {
-			m.selectionQuadEntities.setOptions({visible:alberoToolbox.showHoverQuad});
+			m.selectionQuadEntities.clear();
 		});
 	});
 

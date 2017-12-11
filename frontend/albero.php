@@ -47,12 +47,37 @@ if ($socket === false) {
 $in = json_encode($request_body);
 
 socket_write($socket, $in, strlen($in));
-
+/*
 while ($out = socket_read($socket, 65535)) {
-	//var_dump(json_decode($out,true));
-
 	break;
+}*/
+
+
+$out="";
+while($resp = socket_read($socket, 65535)) {
+   $out .= $resp;
+   if (strpos($out, "\n") !== false) break;
 }
+
+$out = rtrim($out);
+
+/*
+$i = 0;
+
+$out="";
+while ($partial = socket_read($socket, 65535)) {
+
+if(!$partial){break;}
+$i++;
+if($i==10) break;
+
+	var_dump($partial);
+
+	$out  .= $partial;	
+}
+*/
+//echo("DOne");
+//return;
 
 
 // open the file in a binary mode
@@ -96,6 +121,7 @@ switch($request_body['action'])
 	case "get_analog_viewer":
 	case "initialize":
 	case "ping":
+	default:
 		echo($out);
 	break;
 

@@ -62,4 +62,13 @@ namespace Commands{
     public:
         std::string Execute(Albero2* albero, rapidjson::Document& document);
     };
+
+    // Returns the available reforecast dates in JSON format.
+    class GetAvailableDays: public Command
+    {
+    public:
+        std::string Execute(Albero2* albero, rapidjson::Document& document);
+    };
+
+
 }

@@ -70,13 +70,16 @@ function OpenUberMap(){
 		$("#alberoMipmapDialog #ubermap_body").append(tr);
 
 
-		// OBSERVED
+		// OBSERVED (Only if the observations are available)
 		var tr = $("<tr><td class='small'></td></tr>");
 		for(var accumulation_range_index = 0; accumulation_range_index < Albero.configuration["accumulation-ranges"]; accumulation_range_index++){
+			if(Albero.stats[accumulation_range_index].current_date_has_observations==1){
 				var td = $("<td class='threshold_map_selector label' threshold_index='-2' range_index='"+accumulation_range_index+"'><p>Observed</p></td>")
 				tr.append(td);
+			}
 		}
 		$("#alberoMipmapDialog #ubermap_body").append(tr);
+		
 
 
 		// MSE
@@ -87,38 +90,29 @@ function OpenUberMap(){
 		}
 		$("#alberoMipmapDialog #ubermap_body").append(tr);
 
-
-
-	
 }
 
 
 // Renders a mipmap selector for the Ubermap
 function RenderSelectorTD(threshold_index, range_index){
 
+
 	var url = "albero_images/forecast8_prob_map_" + threshold_index + "_" + range_index + ".png?time="+Date.now();
 
 	var e = " \
-	<td class = 'threshold_map_selector minimap' threshold_index='{0}' range_index='{1}' >			\
+	<td class = 'threshold_map_selector minimap' threshold_index='"+threshold_index+"' range_index='"+range_index+"' >			\
 		<div class='threshold_selctor_image_wrapper'>								\
-			<img class='ubermap_minimap' width='90' height='151' src='{2}' />				\
+			<img class='ubermap_minimap' width='90' height='151' src='"+url+"' />				\
 			<img class='ubermap_contour' width='90' height='151' src='albero_resources/contourmap.png' />		\
 		</div>			\
 	</td>	\
-	".format(threshold_index,range_index,url);
+	";
 
 	return e;
-
 }
 
 
-
-
-
-
-
-
-$(document).ready(function(){
+function InitMipmaps(){
 
 	// select accumulation range
 	activate_range(0);
@@ -207,9 +201,9 @@ min_probabilistic_forecast
 		$("#albero_floating_scale").show();
 
 
-	})
+	});
 
-});
+}
 
 
 function UpdateMiniBingmaps(range_index){

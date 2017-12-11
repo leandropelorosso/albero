@@ -15,7 +15,7 @@ public:
 	static float *GetRawValues(int date, int range_index);
 
 	static float* ReadRangeFromFile(int date, size_t start[], size_t count[], int range_index);
-
+    static bool HasDate(int date);
 
 	static std::unordered_map<int, size_t> days_index_in_file;
 	static void Init();

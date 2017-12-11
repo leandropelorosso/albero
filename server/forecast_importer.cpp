@@ -112,8 +112,16 @@ void ForecastImporter::Import(std::string day_file, std::string collection_file)
 
         // Get destination Time
         NcDim dst_dim_time = dst_file.getDim("time");
-        float* dst_time = new float[dst_dim_time.getSize()+1];
+        float* dst_time = new float[dst_dim_time.getSize()];
         dst_file.getVar("time").getVar(dst_time);
+
+        // Get destination Time
+        float* dst_intTime = new float[dst_dim_time.getSize()];
+        dst_file.getVar("intTime").getVar(dst_intTime);
+
+        /*for(int i=0; i<dst_dim_time.getSize(); i++ ){
+            cout << std::fixed << dst_intTime[i] << endl;
+        }*/
 
         cout << "[] Opening source file \"" << day_file << "\"." << endl;
 
@@ -140,8 +148,13 @@ void ForecastImporter::Import(std::string day_file, std::string collection_file)
         src_file.getVar("time").getAtt("reference_date").getValues(src_reference_date);
         tm src_reference_tm_date = dateToTMDate(src_reference_date);
 
+        char chDate[8] = "";
+        strftime(chDate, 10, "%Y%m%d", &src_reference_tm_date );
+        int src_reference_date_int = stoi(string(chDate) + "00");
+
         cout << "[] File reference date: ";
-        cout << (src_reference_tm_date.tm_mon + 1) << "/" << src_reference_tm_date.tm_mday << "/" << (src_reference_tm_date.tm_year+1900) << endl;
+        string src_reference_date_formatted = to_string(src_reference_tm_date.tm_mon + 1) + "/" + to_string(src_reference_tm_date.tm_mday) + "/" + to_string((src_reference_tm_date.tm_year+1900));
+        cout << src_reference_date_formatted << " or as integer " << src_reference_date_int << endl;
 
         // Get all hours
         float* src_fhour = new float[src_dim_time.getSize()];
@@ -230,6 +243,19 @@ void ForecastImporter::Import(std::string day_file, std::string collection_file)
         dst_file.getVar("time").putVar(start_time, count_time, times);
 
         cout << "[] After: " << dst_dim_time.getSize() << " Days." << endl;
+
+        // Save intTime
+
+        std::vector<size_t> start_intTime(1);
+        std::vector<size_t> count_intTime(1);
+
+        start_intTime[0] = dst_dim_time.getSize() - 1;
+        count_intTime[0] = 1;
+
+        long *intTimes = new long[1];
+
+        intTimes[0] = src_reference_date_int;
+        dst_file.getVar("intTime").putVar(start_intTime, count_intTime, intTimes);
 
         // Add the new day to the reforecast collection
 

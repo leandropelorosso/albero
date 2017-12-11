@@ -79,7 +79,7 @@ int Albero2::ReadHistoricForecasts(int current_date){
         forecasts->Initialize(reforecast_file_path);
     }
 
-    forecasts->Read(current_date, 24, 3); // TODO: This should come from configuration
+    forecasts->Read(current_date, this->accumulationRangeHs, this->nAccumulationRanges); // TODO: This should come from configuration
 
     NFHOUR = (int)forecasts->NFHOUR;
     NLAT = (int)forecasts->NLAT;
@@ -135,6 +135,8 @@ int Albero2::CalculateAnalogs(){
                 {
                     // get the historic forecast [NLATxNLON]
                     // TODO: It is not necessary to use forecast_index here, it can be replaces by a simple calculation.
+
+                    if(!ObservationReader::HasDate(date)) continue; // Only if there is an observation associated with the forecast.
                     float* historic_forecast = &this->forecasts->forecasts_by_range[accumulation_range][this->forecasts->forecast_index[date]];
 
                     // ... and calculate the MSE of the region suroinding the center block.
@@ -1073,10 +1075,8 @@ int Albero2::Initialize(int current_date)
     }
 
 
-
-
-
-
+    // Check if the requested date has observations.
+    this->stats->current_date_has_observations = ObservationReader::HasDate(current_date);
 
     return 0;
 }
@@ -1135,7 +1135,8 @@ string Statistics::ToJSON(){
             ", \"max_observation\":\"" + to_string(this->max_observation[i]) + "\"" +
             ", \"min_observation\":\"" + to_string(this->min_observation[i]) + "\"" +
             ", \"max_probabilistic_forecast\":\"" + to_string(this->max_probabilistic_forecast[i]) + "\"" +
-            ", \"min_probabilistic_forecast\":\"" + to_string(this->min_probabilistic_forecast[i]) + "\""
+            ", \"min_probabilistic_forecast\":\"" + to_string(this->min_probabilistic_forecast[i]) + "\"" +
+            ", \"current_date_has_observations\":\"" + to_string(this->current_date_has_observations) + "\""
             "}";
 
         if (i < accumulation_ranges-1) result += ",";

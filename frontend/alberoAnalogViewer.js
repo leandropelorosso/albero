@@ -214,6 +214,11 @@ function alberoAnalogViewerClickOnMap(e, loc)
 {
 	if(alberoToolbox.showHoverQuad)
 	{
+		// add the selected region rectangle
+		$.each(Maps, function( i, m ) {
+			AddSelectedRegion(m, loc);
+		});
+
 		alberoDisplayAnalogViewer(loc.latitude, loc.longitude, albero_selected_range);
 	}
 }

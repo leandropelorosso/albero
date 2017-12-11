@@ -7,14 +7,14 @@
 	<form>
 		<ul>
 			<li>Analog Range</li>
-			<li><input name="analog-range-from" class="date" value="12/07/2002"/></li>
+			<li><input readonly name="analog-range-from" class="date" value="12/07/2002"/></li>
 			<li>to</li>
-			<li><input name="analog-range-to" class="date" value="01/01/2013"/> </li>
+			<li><input readonly name="analog-range-to" class="date" value="23/07/2015"/> </li>
 		</ul>
 		
 		<ul>
 			<li>Valid Date</li>
-			<li><input name="date" class="date" value="04/01/2013"/></li>
+			<li><input id="current-forecast-date" name="date" value="04/01/2013"/></li>
 		</ul>
 
 		<ul>

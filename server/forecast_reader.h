@@ -60,5 +60,7 @@ public:
 	int lat_varid, lon_varid, precipitation_varid, time_varid, fhour_varid, ens_varid, inttime_varid;
 	int lat_dimid, lon_dimid, time_dimid, fhour_dimid, ens_dimid;
 
+    // Imports a file and adds it to the current collection
+    void ImportDay(string filename);
 };
 
