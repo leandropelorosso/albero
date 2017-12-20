@@ -54,7 +54,7 @@ public:
 	int GetDateIndex(int date);
 	
 	/* This will be the netCDF ID for the file and data variable. */
-	int ncid;
+    int ncid = -1;
 
 	/* Variable and dimensions IDs */
 	int lat_varid, lon_varid, precipitation_varid, time_varid, fhour_varid, ens_varid, inttime_varid;
@@ -62,5 +62,8 @@ public:
 
     // Imports a file and adds it to the current collection
     void ImportDay(string filename);
+
+    // Closes netcfd file.
+    void CloseFile();
 };
 

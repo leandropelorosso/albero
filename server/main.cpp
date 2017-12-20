@@ -214,16 +214,31 @@ void halt_handler(int s) {
 int main(int argc, char* argv[])
 {
 
- /*   ForecastImporter* imp = new ForecastImporter();
-    imp->Import("/home/vertexar/Downloads/netcdf_concat/2017120900.nc", "/home/vertexar/Downloads/netcdf_concat/reforecasts.nc");
-    delete(imp);
-    return 0;
-*/
+        if(argc==2 && std::string(argv[1]) == "-v"){
+            std::cout << "2.0.7" << endl;
+            return 0;
+        }
 
-    if (argc != 4) {
-		cout << "Error, please specify parameters." << endl;
-		return 0;
-	}
+        // Lets check if we are trying to get in the import mode
+        if(argc == 4){
+            if(std::string(argv[1]) == "-import"){
+
+                // get files paths
+                std::string import_file = std::string(argv[2]);
+                std::string collection_file = std::string(argv[3]);
+
+                // import
+                ForecastImporter* imp = new ForecastImporter();
+                imp->Import(import_file, collection_file);
+                delete(imp);
+                return 0;
+            }
+        }
+
+        if (argc != 4) {
+            cout << "Error, please specify parameters." << endl;
+            return 0;
+        }
 
 	// Listen for CTRL-C
 	struct sigaction sigIntHandler;

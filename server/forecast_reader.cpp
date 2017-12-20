@@ -27,8 +27,11 @@ ForecastReader::ForecastReader()
 }
 
 
-ForecastReader::~ForecastReader()
-{
+ForecastReader::~ForecastReader(){
+
+    /* Close the file. */
+    this->CloseFile();
+
     delete(forecast_days);
     delete(lats);
     delete(lons);
@@ -38,6 +41,12 @@ ForecastReader::~ForecastReader()
         }
         delete(forecasts_by_range);
     }
+}
+
+void ForecastReader::CloseFile(){
+    /* Close the file. */
+    if(ncid!=-1) nc_close(ncid);
+    ncid = -1;
 }
 
 // converts a date of format YYYYMMDD00 to struct tm
@@ -275,6 +284,9 @@ int ForecastReader::Read(int date, int accumulation_range_hs, int accumulation_r
 
     // delete the auxiliary forecast
     delete(forecast);
+
+    // close file, we won't read anymore.
+    this->CloseFile();
 
     return 1;
 

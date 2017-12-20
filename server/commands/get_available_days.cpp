@@ -14,6 +14,8 @@ std::string GetAvailableDays::Execute(Albero2* albero, rapidjson::Document& docu
     ForecastReader *forecasts = new ForecastReader();
     forecasts->Initialize(reforecast_file_path);
 
+    std::cout << forecasts->NTIME << endl;
+
     // Create JSON from days
     std::string result = "[";
     for(int i=0; i<forecasts->NTIME; i++){
