@@ -43,10 +43,9 @@ string cmorph_data_file = "";
 string cmorph_index_file = "";
 string reforecast_file_path = "";
 string cmorph_data_folder = "";
-int times_in_range = 4; // from the configuration, how many times (6 hour slot) in a range
-int accumulation_ranges; // amount of accumulation ranges
+int times_in_range = 0; // from the configuration, how many times (6 hour slot) in a range
+int accumulation_ranges = 0; // amount of accumulation ranges
 
-float *ObservationReader::file_data = NULL;
 int* csock = NULL;
 volatile sig_atomic_t stop;
 
@@ -198,8 +197,7 @@ void dispose() {
 	if (albero2 != NULL) {
 		delete(albero2);
 	}
-	Color::Dispose();
-	ObservationReader::Dispose();
+	Color::Dispose();	
 	delete(requests_queue);
 	if (csock != NULL)delete(csock);
 }
@@ -268,11 +266,7 @@ int main(int argc, char* argv[])
     PCT::numerical_forecast_schema = (new hcl(Vector2(80.0f, 1.36f), Vector2(231.00000000000003f, 0.16797619047619047f)))->discretization(5);
     PCT::probabilistic_forecast_schema = (new hcl(Vector2(65.57142857142857f, 1.2729761904761905f), Vector2(351.0f, 0.3096428571428571f)))->discretization(10);
     PCT::mse_schema = (new hcl(Vector2(93.00000000000001f, 1.3498809523809523f), Vector2(10.714285714285714f, 0.9694047619047619f)))->discretization(2);
-    PCT::bias_schema = new HCLDiverging();
-
-    // Read the observations
-	cout << "[] ObservationReader::Init()" << endl;
-	ObservationReader::Init();
+    PCT::bias_schema = new HCLDiverging(); 
 
     // Render color scales to be used on the front end
     PCT::numerical_forecast_schema->render_scale(10, 200, 0, 60, albero_images_path + "numerical_forecast_big_scale.png");

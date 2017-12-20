@@ -41,7 +41,7 @@ std::string Commands::GetObservation::Execute(Albero2* albero2, rapidjson::Docum
     cout << "REQ>>NumForecast>> " << x << ", " << y << ", " << z << endl;
 
     /* Grabamos los valores interpolados */
-    float *observation_values = ObservationReader::GetInterpolatedValuesLambert(date, range_index, init_lat_pixel, init_lon_pixel, end_lat_pixel, end_lon_pixel, 256, 256, z);
+    float *observation_values = albero2->observations->GetInterpolatedValuesLambert(date, range_index, init_lat_pixel, init_lon_pixel, end_lat_pixel, end_lon_pixel, 256, 256, z);
     if (observation_values == NULL) {
         return "none";
     }

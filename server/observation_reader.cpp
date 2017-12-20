@@ -41,45 +41,13 @@
 
 using namespace std;
 
-double time_reading_dat_files = 0;
-
 extern string cmorph_data_file;
 extern string cmorph_index_file;
 extern int times_in_range;
 extern int accumulation_ranges;
 
-
-FILE* ObservationReader::file = NULL;
-
-size_t ObservationReader::NTIME;
-
-std::unordered_map<int, size_t> ObservationReader::days_index_in_file;
-
-float ObservationReader::file_init_lon;
-float ObservationReader::file_end_lon;
-float ObservationReader::file_init_lat;
-float ObservationReader::file_end_lat;
-float ObservationReader::delta_lat;
-float ObservationReader::delta_lon;
-//float* ObservationReader::file_data;
-
-int ObservationReader::file_lats = 154;
-int ObservationReader::file_lons = 106;
-
-
-/*
-date: date we want the velues from
-init_lat: inicial latitude
-init_lon: inicial longitud
-end_lat: ending latitude
-end_lon: ending longitude
-amount_steps_lat: amount of latitude points we'll retrieve
-amount_steps_lat: amount of longitude points we'll retrieve
-*/
-
 float *ObservationReader::GetInterpolatedValues(int date, int range_index, float init_lat, float init_lon, float end_lat, float end_lon, int amount_steps_lat, int amount_steps_lon)
 {
-	
 	if (init_lat > end_lat){
 		swap(init_lat, end_lat);
 	}
@@ -200,6 +168,9 @@ off_t fsize(const char *filename) {
 
 void ObservationReader::Init(){
 	
+    this->file_lats = 154; // TODO : Retrieve from index file.
+    this->file_lons = 106;
+
 	// Read Data File
 	cout << "[] Reading " << cmorph_data_file;
 
@@ -217,8 +188,8 @@ void ObservationReader::Init(){
 
 	off_t pos = fsize(cmorph_data_file.c_str());
 
-	ObservationReader::file_data = new float[pos / sizeof(float)];
-	size_t read = fread(ObservationReader::file_data, sizeof(float), pos / (sizeof(float)), file);
+    this->file_data = new float[pos / sizeof(float)];
+    size_t read = fread(this->file_data, sizeof(float), pos / (sizeof(float)), file);
 
 	fclose(file);
 
@@ -368,8 +339,8 @@ float *ObservationReader::GetRawValues(int date, int range_index){
 	
 	// create the count and start array to read the netcdf.
 	count[0] = 1; // AHORA VIENEN ACUMULADOS!
-	count[1] = ObservationReader::file_lats;
-	count[2] = ObservationReader::file_lons;
+    count[1] = this->file_lats;
+    count[2] = this->file_lons;
 	start[0] = 0;
 	start[1] = 0;
 	start[2] = 0;

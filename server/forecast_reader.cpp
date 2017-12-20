@@ -187,11 +187,11 @@ int ForecastReader::Read(int date, int accumulation_range_hs, int accumulation_r
     struct tm min_window_tm = *localtime ( &min_window_time_t );
     struct tm max_window_tm = *localtime ( &max_window_time_t );
 
-
+    /*
     cout << (current_tm.tm_year+1900) << "/" << (current_tm.tm_mon+1) << "/" << current_tm.tm_mday << endl;
     cout << (min_window_tm.tm_year+1900) << "/" << (min_window_tm.tm_mon+1) << "/" << min_window_tm.tm_mday << endl;
     cout << (max_window_tm.tm_year+1900) << "/" << (max_window_tm.tm_mon+1) << "/" << max_window_tm.tm_mday << endl;
-
+    */
 
     // iterate all the days on the file and check if it falls inside the time windows we need.
     // here we will retrieve a list of days indexes of days we will need to read from the netcdf.
@@ -254,8 +254,7 @@ int ForecastReader::Read(int date, int accumulation_range_hs, int accumulation_r
         // add the forecast date to the list of days
         this->forecast_date.push_back(day);
 
-        cout << "Forecast for Date:" << day << " | " << write_index << endl;
-
+        //cout << "Forecast for Date:" << day << " | " << write_index << endl;
 
         // forecast contains one forecast for multiple hours (every 6 hours), so we need to add by accumulation group
         for (int range = 0; range < accumulation_ranges; range++){

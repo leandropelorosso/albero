@@ -50,6 +50,7 @@ Albero2::~Albero2()
 
     // Lets clean the structures if they were used
     if (this->forecasts != NULL) delete(forecasts);
+    if (this->observations!= NULL) delete(observations);
 
     if (this->probability_map != NULL){
         for (int i = 0; i < this->threshold_ranges.size() * nAccumulationRanges; i++){
@@ -136,7 +137,7 @@ int Albero2::CalculateAnalogs(){
                     // get the historic forecast [NLATxNLON]
                     // TODO: It is not necessary to use forecast_index here, it can be replaces by a simple calculation.
 
-                    if(!ObservationReader::HasDate(date)) continue; // Only if there is an observation associated with the forecast.
+                    if(!this->observations->HasDate(date)) continue; // Only if there is an observation associated with the forecast.
                     float* historic_forecast = &this->forecasts->forecasts_by_range[accumulation_range][this->forecasts->forecast_index[date]];
 
                     // ... and calculate the MSE of the region suroinding the center block.
@@ -522,7 +523,7 @@ RegionForecastCollection* Albero2::GetAnalogForecasts(float lat, float lon, int 
         float init_lon = forecasts->lons[init_lon_index];
         float end_lon = forecasts->lons[init_lon_index + ANALOG_DIMENSION];
 
-        float *observation_values = ObservationReader::GetInterpolatedValues(date, accumulation_range, init_lat, init_lon, end_lat, end_lon, 220, 220);
+        float *observation_values = this->observations->GetInterpolatedValues(date, accumulation_range, init_lat, init_lon, end_lat, end_lon, 220, 220);
 
         forecast_region[analog_index]->observation_values = observation_values;
 
@@ -660,7 +661,7 @@ int Albero2::CalculateProbabilisticForecast(){
                     //	date = 20110826;
 
                     // get the observation
-                    float *observation_values = ObservationReader::GetInterpolatedValues(local_analogs[analog_index].date, accumulation_range_index, init_lat, init_lon, end_lat, end_lon, observations_in_region_width, observations_in_region_width);
+                    float *observation_values = this->observations->GetInterpolatedValues(local_analogs[analog_index].date, accumulation_range_index, init_lat, init_lon, end_lat, end_lon, observations_in_region_width, observations_in_region_width);
 
                     /*
                     if (point_lat == -34 && point_lon == -59){
@@ -1039,6 +1040,13 @@ int Albero2::Initialize(int current_date)
 
     cout << ":: Initializing..." << endl;
 
+    // Read the observations, once on the life cycle.
+    if(this->observations == NULL){
+        cout << "[] ObservationReader::Init()" << endl;
+        this->observations = new ObservationReader();
+        this->observations->Init();
+    }
+
     // Read the historic forecasts
     cout << ":: Reading historic forecasts..." << endl;
     ReadHistoricForecasts(current_date);
@@ -1057,12 +1065,12 @@ int Albero2::Initialize(int current_date)
     // We'll do one last thing, which is calculating max and min for the observed data on the accumulation ranges
     for (int range = 0; range < nAccumulationRanges; range++){
 
-        float *values = ObservationReader::GetRawValues(current_date * 100, range);
+        float *values = this->observations->GetRawValues(current_date * 100, range);
 
         float min_value = MAX_FLOAT;
         float max_value = 0;
 
-        for (int i = 0; i < ObservationReader::file_lats * ObservationReader::file_lons; i++){
+        for (int i = 0; i < this->observations->file_lats * this->observations->file_lons; i++){
             float v = values[i];
             max_value = fmaxf(max_value, v);
             min_value = fminf(min_value, v);
@@ -1076,7 +1084,7 @@ int Albero2::Initialize(int current_date)
 
 
     // Check if the requested date has observations.
-    this->stats->current_date_has_observations = ObservationReader::HasDate(current_date);
+    this->stats->current_date_has_observations = this->observations->HasDate(current_date);
 
     return 0;
 }

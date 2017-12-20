@@ -2,6 +2,7 @@
 
 #include "helper.h"
 #include "forecast_reader.h"
+#include "observation_reader.h"
 #include <list>
 #include "color_schema.h"
 #include "map"
@@ -51,7 +52,8 @@ public:
 	float **mean_square_error_map = NULL; // the mean square error for the whole area
 	
 	
-	ForecastReader *forecasts= NULL; // the forecast reader
+    ForecastReader *forecasts = NULL; // the forecast reader
+    ObservationReader *observations = NULL; // the forecast reader
 	
 /*	float **current_forecast_by_range = NULL; // current forecast by range
 	float **historic_forecast_by_range = NULL; // history forecasts by range
