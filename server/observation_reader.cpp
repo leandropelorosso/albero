@@ -177,13 +177,6 @@ void ObservationReader::Init(){
 		cout << "Error reading dat_file" << endl;
 	}
 
-	/*
-	_fseeki64(file, 0L, SEEK_END);
-	fpos_t pos;
-	fgetpos(file, &pos);
-	_fseeki64(file, 0L, SEEK_SET);
-	*/
-
 	off_t pos = fsize(cmorph_data_file.c_str());
 
     this->file_data = new float[pos / sizeof(float)];
@@ -217,7 +210,6 @@ void ObservationReader::Init(){
 	delete(key);
 	delete(value);
 
-	//cout << (fpos_t)days_index_in_file[20060331] << endl;
 	input.close();
 
 	cout << " OK" << endl;
@@ -266,12 +258,6 @@ float *ObservationReader::GetInterpolatedValuesLambert(int date, int range_index
 	string month = str_date.substr(4, 2);
 	string day = str_date.substr(6, 2);
 
-	/*float file_init_lon = 282.875 - 360;
-	float file_end_lon = 309.125f - 360;
-	float file_init_lat = -57.125;
-	float file_end_lat = -18.875f; 
-	*/
-
 	int NLAT = file_lats;
 	int NLON = file_lons;
 
@@ -299,10 +285,6 @@ float *ObservationReader::GetInterpolatedValuesLambert(int date, int range_index
 
 	if (init_lon_index > end_lon_index || init_lat_index > end_lat_index) return NULL;
 
-	/*assert(init_lon_index < end_lon_index);
-	assert(init_lat_index < end_lat_index);
-	*/
-
 	// create the count and start array to read the netcdf.
 	count[0] = 1; // AHORA VIENEN ACUMULADOS!
 	count[1] = (end_lat_index - init_lat_index) + 1; // lat
@@ -313,20 +295,12 @@ float *ObservationReader::GetInterpolatedValuesLambert(int date, int range_index
 
 	float *all_hours_value_from_dat = ReadRangeFromFile(date, start, count, range_index);
 
-/*	for (int i = 0; i < count[1] * count[2]; i++){
-		if (all_hours_value_from_dat[i] != 0){
-			cout << all_hours_value_from_dat[i] << endl;
-		}
-	}
-	*/
 	float *interpolated_values = Interpolate8(all_hours_value_from_dat, (int)count[2], (int)count[1], bound_init_lat, bound_init_lon, bound_end_lat, bound_end_lon,
 		init_lat_pixel, init_lon_pixel, end_lat_pixel, end_lon_pixel, amount_steps_lat, amount_steps_lon, zoom);
 
 	delete(all_hours_value_from_dat);
 
 	return interpolated_values;
-
-
 }
 
 
@@ -405,36 +379,6 @@ float* ObservationReader::ReadRangeFromFile(int date, size_t start[], size_t cou
 				size_t result_index = (lat - start[1]) * count[2] + lon;
 				size_t lon_hour_index = lon * times_per_day + time;
 				float value = (file_data[file_start + lon_hour_index]);
-
-				float real_lat = file_init_lat + lat*delta_lat;
-				float real_lon = file_init_lon + (lon + start[2])*delta_lon;
-
-//				if ((file_init_lat + lat*delta_lat) == -34.875 /*&& (file_init_lon + (lon + start[2])*delta_lon) == -58.875*/ /*&& date==2005022600*/){
-
-				/*
-				float test_lat = -34.875;
-				float test_lon = -58.875;
-				
-				if (date == 2005022600 &&
-
-					((real_lat == test_lat - .75f && real_lon == test_lon - .75f) || (real_lat == test_lat - .50f && real_lon == test_lon - .50f) || (real_lat == test_lat - .25f && real_lon == test_lon - .25f) || (real_lat == test_lat && real_lon == test_lon) || (real_lat == test_lat + .25f && real_lon == test_lon + .25f) || (real_lat == test_lat + .50f && real_lon == test_lon + .50f) || (real_lat == test_lat + .75f && real_lon == test_lon + .75f) || (real_lat == test_lat + 1.0f && real_lon == test_lon + 1.0f) ||
-					 (real_lat == test_lat + .50f && real_lon == test_lon - .50f) || (real_lat == test_lat + .25f && real_lon == test_lon - .25f) || (real_lat == test_lat && real_lon == test_lon) || (real_lat == test_lat - .25f && real_lon == test_lon + .25f) || (real_lat == test_lat - .50f && real_lon == test_lon + .50f))){
-					value = 1000;
-				}
-				else{
-					
-					
-					if (date == 2008030600 &&
-
-						((real_lat == test_lat + 1 - .75f && real_lon == test_lon + 1 - .75f) || (real_lat == test_lat + 1 - .50f && real_lon == test_lon + 1 - .50f) || (real_lat == test_lat + 1 - .25f && real_lon == test_lon + 1 - .25f) || (real_lat == test_lat + 1 && real_lon == test_lon + 1) || (real_lat == test_lat + 1 + .25f && real_lon == test_lon + 1 + .25f) || (real_lat == test_lat + 1 + .50f && real_lon == test_lon + 1 + .50f) || (real_lat == test_lat + 1 + .75f && real_lon == test_lon + .75f + 1) || (real_lat == test_lat + 1 + 1.0f && real_lon == test_lon + 1 + 1.0f))){
-					
-						value = 1000;
-					}
-					else{
-						value = 0;
-					}
-				}
-				*/
 
 				result[result_index] += (value * 3);
 			}

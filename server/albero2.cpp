@@ -75,7 +75,7 @@ Albero2::~Albero2()
 // Reads the historic forecasts from the forecasts netcdf.
 int Albero2::ReadHistoricForecasts(int current_date){
 
-    forecasts->Read(current_date/*, this->accumulationRangeHs, this->nAccumulationRanges*/);
+    forecasts->Read(current_date);
 
     NFHOUR = (int)forecasts->NFHOUR;
     NLAT = (int)forecasts->NLAT;
@@ -582,11 +582,6 @@ RegionForecastCollection* Albero2::GetAnalogForecasts(float lat, float lon, int 
 // Calculates probabilistic forecast.
 int Albero2::CalculateProbabilisticForecast(){
 
-    // This matrix will hold the observations for all the points on the map. We'll call this the probability points, which really contains the
-    // different observations and the weights associated to the point on the overlapping calculations.
-    //int analog_observation_height = ((NLAT-1) * (OBSERVATIONS_PER_PANEL - 1)) + 1;
-    //int analog_observation_width = ((NLON-1) * (OBSERVATIONS_PER_PANEL - 1)) + 1;
-
     probability_map_height = ((NLAT - 1) * (OBSERVATIONS_PER_PANEL-1)) + 1;
     probability_map_width = ((NLON - 1) * (OBSERVATIONS_PER_PANEL-1)) + 1;
 
@@ -628,19 +623,11 @@ int Albero2::CalculateProbabilisticForecast(){
 
                 // now we retrieve the observations for the whole analog area (the area surounding the current block)
 
-                /*
-                float init_lat = point_lat - floor((ANALOG_DIMENSION) / 2.0f) * 1.0f; // BY 1.0 BECAUSE THE RESOLUTION IS 1 DEGREE
-                float end_lat = init_lat + ANALOG_DIMENSION * 1.0f; // BY 1.0 BECAUSE THE RESOLUTION IS 1 DEGREE
-                float init_lon = point_lon - floor((ANALOG_DIMENSION) / 2.0f) * 1.0f; // BY 1.0 BECAUSE THE RESOLUTION IS 1 DEGREE
-                float end_lon = init_lon + ANALOG_DIMENSION * 1.0f; // BY 1.0 BECAUSE THE RESOLUTION IS 1 DEGREE
-                */
-
                 float init_lat = point_lat + 1;
                 float end_lat = point_lat - 2;
 
                 float init_lon = point_lon - 1;
                 float end_lon = point_lon + 2;
-
 
                 // here we'll store the analogs observations for the region.
                 float** region_observations = new float*[N_ANALOGS_PER_LAT_LON];
@@ -651,26 +638,8 @@ int Albero2::CalculateProbabilisticForecast(){
                 // iterate the analogs and retrieve the observation for the region.
                 for (int analog_index = 0; analog_index < N_ANALOGS_PER_LAT_LON; analog_index++){
 
-                    // get the analog date.
-                    //int date = forecasts->forecast_days[(int)(NTIME - (NYEARS - local_analogs[analog_index].year)*365.25f - 45) + local_analogs[analog_index].time];
-                    //	date = 20110826;
-
                     // get the observation
                     float *observation_values = this->observations->GetInterpolatedValues(local_analogs[analog_index].date, accumulation_range_index, init_lat, init_lon, end_lat, end_lon, observations_in_region_width, observations_in_region_width);
-
-                    /*
-                    if (point_lat == -34 && point_lon == -59){
-                        for (int i = 0; i < observations_in_region_width*observations_in_region_width; i++){
-                        //	cout << observation_values[i] << " ";
-                        }
-                    }
-                    else
-                    {
-                        for (int i = 0; i < observations_in_region_width*observations_in_region_width; i++){
-                            observation_values[i] = 0;
-                        }
-                    }
-                    */
 
                     if (observation_values == NULL){
                         cout << "ERROR!!!!" << endl;
@@ -704,24 +673,6 @@ int Albero2::CalculateProbabilisticForecast(){
                         float sub_point_lat = forecasts->lats[0] + global_y * 0.25f;
                         float sub_point_lon = forecasts->lons[0] + global_x * 0.25f;
 
-                    /*	if (point_lat == -34 && point_lon == -59){
-                            cout << "[lat,lon]=" << sub_point_lat << " : " << sub_point_lon << endl;
-                        }
-                    */
-
-
-                    /*	if (sub_point_lat == -33 && sub_point_lon == -60){
-                            //assert(global_x == 70);
-                            //assert(global_y == 86);
-                            cout << global_x;
-                            cout << global_y;
-                        }
-                        /*
-                        if (point_lat == -34 && point_lon == -59){
-                            cout << "[x,y]=" << global_x << " : " << global_y << endl;
-                        }
-                        */
-
                         // find the index to the probability point matrix
                         int pp_index = CPU_PROBABILITY_POINT(global_x, global_y, dimension);
                         float *point_observations = &probability_points[pp_index];
@@ -753,15 +704,8 @@ int Albero2::CalculateProbabilisticForecast(){
 
         cout << "." << endl;
 
-
         float D = max_distance; // maximun distance (used on the weight calculation)
 
-        //float threshold = 0.0f; // we are looking for observations higher than the threshold.
-        //int threshold_amount = 5;
-        //int max_threshold = 80;
-        //float step = (float)max_threshold / ((float)threshold_amount - 1.0f);
-
-        //for (int threshold_index = 0; threshold_index < threshold_amount; threshold_index++)
         int threshold_index = 0;
         for (std::list<ThresholdRange>::const_iterator iterator = threshold_ranges.begin(), end = threshold_ranges.end(); iterator != end; ++iterator)
         {
@@ -776,63 +720,16 @@ int Albero2::CalculateProbabilisticForecast(){
             probability_map[probability_map_index] = new float[(probability_map_width)*(probability_map_height)];
             memset(probability_map[probability_map_index], 0, (probability_map_width)*(probability_map_height)* sizeof(float));
 
-
-            /************ DEBUG TESTING ***/
-            /*
-            float init_lat = forecasts->lats[0];
-            float init_lon = forecasts->lons[0];
-
-            for (int y = 0; y < probability_map_height; y++){
-
-                for (int x = 0; x < probability_map_width; x++){
-
-                    float lat = init_lat + y * 0.25f;
-                    float lon = init_lon + x * 0.25f;
-
-                    if (lat == -34.5 && lon == -58.5){
-                        probability_map[probability_map_index][y * probability_map_width + x] = 100;
-                    }
-
-
-                }
-            }
-            */
-
-                //	probability_map[probability_map_index][y*probability_map_width + x] = v;
-
-            /*
-            if ((y >= 0 && y <= 1 && x >= 0 && x < probability_map_width) ){
-            probability_map[probability_map_index][(probability_map_height - y-1)*probability_map_width + x] = 100;
-            }
-            else
-            {
-            probability_map[probability_map_index][(probability_map_height - y - 1)*probability_map_width + x] = 0;
-            }
-            */
-
-
-
-            /******************************/
-
-
-
-
             // --------------------------------------------------------
             // Generate the smoothed probability matrix
             // --------------------------------------------------------
 
-
-
             float min_value = MAX_FLOAT;
             float max_value = 0;
-
-
             float min_weight= MAX_FLOAT;
             float max_weight = 0;
             float min_normalized_weight = MAX_FLOAT;
             float max_normalized_weight = 0;
-
-
 
             for (int y = 0; y < probability_map_height; y++){
                 for (int x = 0; x < probability_map_width; x++){
@@ -863,8 +760,7 @@ int Albero2::CalculateProbabilisticForecast(){
                     float v = 0; // probabilistic value for the point
 
                     // iterate all the dimensions
-                    for (int dimension = 0; dimension < ANALOG_DIMENSION*ANALOG_DIMENSION; dimension++)
-                    //int dimension = 4;
+                    for (int dimension = 0; dimension < ANALOG_DIMENSION*ANALOG_DIMENSION; dimension++)               
                     {
 
                         // retroeve the observations for the point in the current dimension
@@ -875,8 +771,7 @@ int Albero2::CalculateProbabilisticForecast(){
                         float weight = point_observations[0];
                         float normalized_weight = 0;
                         if (weight_sum != 0){
-                            normalized_weight = weight / weight_sum;
-                            //cout << weight << " " << normalized_weight << endl;
+                            normalized_weight = weight / weight_sum;                          
                         }
 
                         max_normalized_weight = fmaxf(normalized_weight, max_normalized_weight);
@@ -894,97 +789,25 @@ int Albero2::CalculateProbabilisticForecast(){
                             if (point_value > range.from ) {
                                 amount_above_treshold++; // note that +1 since 0 is the weight
                             }
-
                         }
 
                         // calculate the probability
                         float probability = (100.0f / N_ANALOGS_PER_LAT_LON)*amount_above_treshold;
 
-                        //  normalized_weight = 1;
                         // acumulate the probability using the dimensions weight.
                         v += probability *normalized_weight;
-
-
-                        //v = point_observations[1];
-                        //delete(point_observations);
                     }
-                    /*
-                    if (x >= 64 && x <= 76 && y >= 80 && y <= 92){
-                        probability_map[probability_map_index][y*probability_map_width + x] = 100;
-                    }
-                    */
+
                     max_value = fmaxf(v, max_value);
                     min_value = fminf(v, min_value);
 
-
                     probability_map[probability_map_index][y*probability_map_width + x] = v;
-
-
-
-
-                    //x = 64...75
-                    //	y = 84...95
-                    /*
-                    if (y == 92 || x == 64){
-                    //if (x>=64 && x<=76 && y>=80 && y<=92){
-                        probability_map[probability_map_index][y*probability_map_width + x] = 100;
-                    }else
-                    {
-                        probability_map[probability_map_index][y*probability_map_width + x] = 0;
-                    }
-                    */
                 }
             }
 
             //stats
             this->stats->max_probabilistic_forecast[accumulation_range_index] = max_value;
             this->stats->min_probabilistic_forecast[accumulation_range_index] = min_value;
-
-
-
-            /************ DEBUG TESTING ***/
-/*
-            float init_lat = forecasts->lats[0];
-            float init_lon = forecasts->lons[0];
-
-            int lat_index = 0;
-            int lon_index = 0;
-
-            for (int y = 0; y < probability_map_height; y++){
-
-                for (int x = 0; x < probability_map_width; x++){
-
-                    float lat = init_lat + y * 0.25f;
-                    float lon = init_lon + x * 0.25f;
-
-
-                    if (x % 4 == 0 && y % 4 == 0){
-                        lon_index = x / 4;
-                        lat_index = y / 4;
-                        assert(forecasts->lats[lat_index] = lat);
-                        assert(forecasts->lons[lon_index] = lon);
-                    }
-
-                    if (y == 0 && x ==00){
-                        probability_map[probability_map_index][y * probability_map_width + x] = 100;
-                    }
-                    //else{
-                    //    probability_map[probability_map_index][y * probability_map_width + x] = 0;
-                    //}
-
-                //	if (int(lat) == -33 && int(lon) == -60){
-                //      probability_map[probability_map_index][y * probability_map_width + x] = 100;
-                //        //						cout << "lon_index : lat_index : global_x : global_y =" << lon_index << ":" << lat_index << ":" << x << " : " << y << endl;
-                //    }
-                //    else{
-                //        probability_map[probability_map_index][y * probability_map_width + x] = 0;
-                //    }
-                }
-            }
-            ************ DEBUG TESTING ***/
-
-
-
 
             PCT::SelectScale(-7, true);
 
@@ -998,8 +821,6 @@ int Albero2::CalculateProbabilisticForecast(){
             cout << albero_images_path + "forecast8_prob_map_" + to_string(threshold_index) + "_" + to_string(accumulation_range_index) + ".png" << endl;
 
             threshold_index++;
-
-
         }
 
         cout << "." << endl;
@@ -1007,10 +828,7 @@ int Albero2::CalculateProbabilisticForecast(){
     }
 
     delete(probability_points);
-
     return 0;
-
-
 }
 
 
@@ -1024,8 +842,6 @@ int Albero2::Initialize(int current_date)
     if (this->forecasts != NULL) delete(forecasts); forecasts = NULL;
     if (this->probability_map != NULL) delete(probability_map); probability_map = NULL;
     if (this->mean_square_error_map != NULL) delete(mean_square_error_map); mean_square_error_map = NULL;
-    //if (this->current_forecast_by_range != NULL) delete(current_forecast_by_range); current_forecast_by_range = NULL;
-    //if (this->historic_forecast_by_range != NULL) delete(historic_forecast_by_range); historic_forecast_by_range = NULL;
     if (this->analogs != NULL) delete(analogs); analogs = NULL;
     if (this->stats!= NULL) delete(stats); stats = NULL;
 
@@ -1034,9 +850,9 @@ int Albero2::Initialize(int current_date)
     cout << ":: Initializing..." << endl;
 
     // Create accumulation ranges, just for now we hardcode them.
-    AccumulationRange a1(0,4);  // [0, 24)
-    AccumulationRange a2(4,8);  // [24, 48)
-    AccumulationRange a3(8,12); // [48, 72)
+    AccumulationRange a1(0,1);  // [0, 24)
+    AccumulationRange a2(1,2);  // [24, 48)
+    AccumulationRange a3(2,3); // [48, 72)
     this->accumulation_ranges.push_back(a1);
     this->accumulation_ranges.push_back(a2);
     this->accumulation_ranges.push_back(a3);
@@ -1091,30 +907,11 @@ int Albero2::Initialize(int current_date)
         delete(values);
     }
 
-
     // Check if the requested date has observations.
     this->stats->current_date_has_observations = this->observations->HasDate(current_date);
 
     return 0;
 }
-
-
-/*
-// Sets the drawing values ranges
-void Albero2::SetDrawingValues(float min, float max){
-    this->render_max_value = max;
-    this->render_min_value = min;
-}
-
-void Albero2::ResetDrawingValues(){
-    this->render_max_value = MAX_FLOAT;
-    this->render_min_value = MAX_FLOAT;
-}*/
-
-
-
-
-
 
 Statistics::Statistics(int accumulation_ranges){
     this->max_observation = new float[accumulation_ranges];

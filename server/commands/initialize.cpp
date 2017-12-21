@@ -21,13 +21,6 @@ std::string Initialize::Execute(Albero2* albero, rapidjson::Document& document){
     albero->N_ANALOGS_PER_LAT_LON = stoi(analogs_amount);
     albero->threshold_ranges.clear();
 
-    //times_in_range = stoi(accumulation_range) / 6; // how many times do we have in a range? Each time are 6 hours.
-    //accumulation_ranges = stoi(accumulation_ranges_str); // for instance: 3
-
-    //albero->nAccumulationRanges = accumulation_ranges; // how many ranges
-    //albero->accumulationRangeHs = stoi(accumulation_range); // length of the range in hs
-
-
     /*
     if (document["configuration"].HasMember("threshold-ranges")){
 
@@ -40,7 +33,6 @@ std::string Initialize::Execute(Albero2* albero, rapidjson::Document& document){
     }
     }*/
 
-
     if (document["configuration"].HasMember("threshold-ranges")) {
 
         const rapidjson::Value& ranges = document["configuration"]["threshold-ranges"];
@@ -50,10 +42,8 @@ std::string Initialize::Execute(Albero2* albero, rapidjson::Document& document){
         }
     }
 
-
     albero->Initialize(stoi(date)*100);
 
     return albero->stats->ToJSON();
-
 }
 

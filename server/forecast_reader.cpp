@@ -262,9 +262,6 @@ int ForecastReader::Read(int date/*, int accumulation_range_hs, int accumulation
         for (int range = 0; range < accumulation_ranges.size(); range++){
 
             // (remember, Total precipitation (kg m?2, i.e., mm) in last 6?h period (00, 06, 12, 18 UTC) or in last 3?h period(03, 09, 15, 21 UTC)[Y])
-            //int hour_start = range * times_in_range + 1;
-            //int hour_end = hour_start + times_in_range;
-
             int hour_start = accumulation_ranges[range].from + 1;
             int hour_end = accumulation_ranges[range].to + 1;
 
