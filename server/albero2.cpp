@@ -53,14 +53,14 @@ Albero2::~Albero2()
     if (this->observations!= NULL) delete(observations);
 
     if (this->probability_map != NULL){
-        for (int i = 0; i < this->threshold_ranges.size() * nAccumulationRanges; i++){
+        for (int i = 0; i < this->threshold_ranges.size() * this->accumulation_ranges.size(); i++){
             delete(probability_map[i]);
         }
         delete(probability_map);
     }
 
     if (this->mean_square_error_map != NULL) {
-        for (int i = 0; i < this->nAccumulationRanges; i++){
+        for (int i = 0; i < this->accumulation_ranges.size(); i++){
             delete(mean_square_error_map[i]);
         }
         delete(mean_square_error_map);
@@ -75,12 +75,7 @@ Albero2::~Albero2()
 // Reads the historic forecasts from the forecasts netcdf.
 int Albero2::ReadHistoricForecasts(int current_date){
 
-    if (forecasts == NULL) {
-        forecasts = new ForecastReader();
-        forecasts->Initialize(reforecast_file_path);
-    }
-
-    forecasts->Read(current_date, this->accumulationRangeHs, this->nAccumulationRanges); // TODO: This should come from configuration
+    forecasts->Read(current_date/*, this->accumulationRangeHs, this->nAccumulationRanges*/);
 
     NFHOUR = (int)forecasts->NFHOUR;
     NLAT = (int)forecasts->NLAT;
@@ -88,7 +83,7 @@ int Albero2::ReadHistoricForecasts(int current_date){
     NTIME = (int)forecasts->NTIME;
 
 
-    size_t dev_analogs_size = NLAT * NLON * this->nAccumulationRanges * N_ANALOGS_PER_LAT_LON;
+    size_t dev_analogs_size = NLAT * NLON * this->accumulation_ranges.size() * N_ANALOGS_PER_LAT_LON;
     analogs = new AnalogIndex[dev_analogs_size];
 
 
@@ -109,7 +104,7 @@ int Albero2::CalculateAnalogs(){
     float min_mse = MAX_FLOAT;
 
     // Foreach accumulation Range
-    for (int accumulation_range = 0; accumulation_range< this->nAccumulationRanges; accumulation_range++){
+    for (int accumulation_range = 0; accumulation_range< this->accumulation_ranges.size(); accumulation_range++){
 
         // Retrieve the forecast for the selected date [NLATxNLON]
         float* current_forecast = &this->forecasts->forecasts_by_range[accumulation_range][this->forecasts->forecast_index[this->current_date]];
@@ -197,10 +192,10 @@ int Albero2::CalculateAnalogs(){
     }
 
     // create the mean square error map for the accumulation ranges
-    this->mean_square_error_map = new float*[this->nAccumulationRanges];
+    this->mean_square_error_map = new float*[this->accumulation_ranges.size()];
 
     // Iterate the accumulation ranges
-    for (int accumulation_range = 0; accumulation_range < this->nAccumulationRanges; accumulation_range++){
+    for (int accumulation_range = 0; accumulation_range < this->accumulation_ranges.size(); accumulation_range++){
 
         max_mse = MIN_FLOAT;
         min_mse = MAX_FLOAT;
@@ -601,11 +596,11 @@ int Albero2::CalculateProbabilisticForecast(){
 
 
     // one probability map per threshold per accumulation range
-    probability_map = new float*[threshold_ranges.size() * nAccumulationRanges];
+    probability_map = new float*[threshold_ranges.size() * accumulation_ranges.size()];
 
 
     // Iterate the accumulation range
-    for (int accumulation_range_index = 0; accumulation_range_index < nAccumulationRanges; accumulation_range_index++)
+    for (int accumulation_range_index = 0; accumulation_range_index < this->accumulation_ranges.size(); accumulation_range_index++)
     {
         memset(probability_points, 0, analog_observations_size * sizeof(float));
 
@@ -1034,17 +1029,33 @@ int Albero2::Initialize(int current_date)
     if (this->analogs != NULL) delete(analogs); analogs = NULL;
     if (this->stats!= NULL) delete(stats); stats = NULL;
 
-    this->stats = new Statistics(nAccumulationRanges); //3 accumulation ranges for now
-
     this->current_date = current_date;
 
     cout << ":: Initializing..." << endl;
+
+    // Create accumulation ranges, just for now we hardcode them.
+    AccumulationRange a1(0,4);  // [0, 24)
+    AccumulationRange a2(4,8);  // [24, 48)
+    AccumulationRange a3(8,12); // [48, 72)
+    this->accumulation_ranges.push_back(a1);
+    this->accumulation_ranges.push_back(a2);
+    this->accumulation_ranges.push_back(a3);
+
+    this->stats = new Statistics(accumulation_ranges.size());
 
     // Read the observations, once on the life cycle.
     if(this->observations == NULL){
         cout << "[] ObservationReader::Init()" << endl;
         this->observations = new ObservationReader();
+        this->observations->accumulation_ranges = this->accumulation_ranges;
         this->observations->Init();
+    }
+
+    // Read Forecasts
+    if (forecasts == NULL) {
+        forecasts = new ForecastReader();
+        this->forecasts->accumulation_ranges = this->accumulation_ranges;
+        forecasts->Initialize(reforecast_file_path);
     }
 
     // Read the historic forecasts
@@ -1060,10 +1071,8 @@ int Albero2::Initialize(int current_date)
     CalculateProbabilisticForecast();
 
 
-
-
     // We'll do one last thing, which is calculating max and min for the observed data on the accumulation ranges
-    for (int range = 0; range < nAccumulationRanges; range++){
+    for (int range = 0; range < this->accumulation_ranges.size(); range++){
 
         float *values = this->observations->GetRawValues(current_date * 100, range);
 

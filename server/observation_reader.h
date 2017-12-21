@@ -6,6 +6,8 @@
 #include <stddef.h>
 #include <fstream>
 #include <unordered_map>
+#include <vector>
+#include "helper.h"
 
 class ObservationReader
 {
@@ -19,9 +21,7 @@ public:
 
     std::unordered_map<int, size_t> days_index_in_file;
     void Init();
-	/*
-	static size_t NLAT;
-	static size_t NLON;*/
+
     size_t NTIME;
 
     int file_lats;
@@ -35,11 +35,11 @@ public:
 
     FILE* file;
 
-
     float* file_data;
 
-    void Dispose();
+    std::vector<AccumulationRange> accumulation_ranges; // the accumulation ranges
 
+    void Dispose();
 };
 
 #endif

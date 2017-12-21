@@ -1,7 +1,9 @@
 #include <string>    
 #include <math.h>
 #include <map>
+#include <vector>
 #include <list>
+#include "helper.h"
 
 using namespace std;
 
@@ -22,15 +24,14 @@ public:
 	float *lats = NULL;
 	float *lons= NULL;
 	
-    // amount of accumulation ranges
-    int accumulation_ranges = 0;
-
     // some statistics
     float min_value = 999999;
     float max_value = -999999;
 
     /* list of days stored on the netcdf file */
 	int *forecast_days = NULL;
+
+    std::vector<AccumulationRange> accumulation_ranges; // the accumulation ranges
 
     // the forecasts by range [range_index]=>[N_DAYSxNLATxNLON]
     // N_DAYS is the amount of days picked for a given date,
@@ -48,7 +49,7 @@ public:
 
     // Reads the forecast, by range, for all dates surounding the given date +-45 days for all years.
     // Grouping the forecasts by accumulation range. For instance, 3 ranges of 24 hs.
-    int Read(int date, int accumulation_range_hs, int accumulation_ranges);
+    int Read(int date/*, int accumulation_range_hs, int accumulation_ranges*/);
 	
 	// Returns the time index for a particular date.
 	int GetDateIndex(int date);

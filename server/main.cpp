@@ -43,8 +43,6 @@ string cmorph_data_file = "";
 string cmorph_index_file = "";
 string reforecast_file_path = "";
 string cmorph_data_folder = "";
-int times_in_range = 0; // from the configuration, how many times (6 hour slot) in a range
-int accumulation_ranges = 0; // amount of accumulation ranges
 
 int* csock = NULL;
 volatile sig_atomic_t stop;

@@ -3,7 +3,7 @@
 #include "helper.h"
 #include "forecast_reader.h"
 #include "observation_reader.h"
-#include <list>
+#include <vector>
 #include "color_schema.h"
 #include "map"
 
@@ -55,24 +55,16 @@ public:
     ForecastReader *forecasts = NULL; // the forecast reader
     ObservationReader *observations = NULL; // the forecast reader
 	
-/*	float **current_forecast_by_range = NULL; // current forecast by range
-	float **historic_forecast_by_range = NULL; // history forecasts by range
-    std::map<int, long> *historical_forecast_index_by_range_and_date; // given the date, we can retrieve the start of the information for said day,
-                                                                      // as historic_forecast_by_range_and_date[range_index][date]
-*/
 	AnalogIndex *analogs = NULL; // Analogs
 	
 	std::list<ThresholdRange> threshold_ranges; // the threshold ranges
 
 	// Renders the ANALOGS block of ANALOG_DIMENSION panels surounding the desired (lat, lon) block.
 	AnalogsResponse* RenderAnalogForecasts(float lat, float lon, int fhour);
-	
-    int nAccumulationRanges; // amount of accumulation ranges
-    int accumulationRangeHs; // length in hours of the accumulation range
-	
-	int current_date;
 
-	//private:
+    int current_date; // Date for which we are calculating the forecast
+
+    std::vector<AccumulationRange> accumulation_ranges; // the accumulation ranges
 
 	RegionForecastCollection* GetCurrentForecast(float lat, float lon, int fhour);
 	RegionForecastCollection* GetAnalogForecasts(float lat, float lon, int fhour);
@@ -94,7 +86,5 @@ public:
 	int NYEARS;
 
 	Statistics *stats = NULL;
-
-
 };
 

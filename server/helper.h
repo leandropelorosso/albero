@@ -170,3 +170,15 @@ struct ThresholdRange{
 		this->to = to;
 	}
 };
+
+// The Accumulation Range. For instance, [0-4) ([0-24hs), pues cada rango tiene 6 horas)
+struct AccumulationRange{
+    float from;
+    float to;
+    public:
+    AccumulationRange(float from, float to){
+        this->from = from;
+        this->to = to;
+    }
+};
+

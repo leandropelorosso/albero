@@ -43,8 +43,6 @@ using namespace std;
 
 extern string cmorph_data_file;
 extern string cmorph_index_file;
-extern int times_in_range;
-extern int accumulation_ranges;
 
 float *ObservationReader::GetInterpolatedValues(int date, int range_index, float init_lat, float init_lon, float end_lat, float end_lon, int amount_steps_lat, int amount_steps_lon)
 {
@@ -390,14 +388,9 @@ float* ObservationReader::ReadRangeFromFile(int date, size_t start[], size_t cou
      else
         date_index = ((size_t)got->second) / sizeof(float);
 
-//     size_t date_index = ((size_t)days_index_in_file[date / 100]) / sizeof(float);
-
-
-
-	// Iterate the exact times we need for the required range
-	for (int time = range_index*times_in_range; time < (range_index+1)*times_in_range; time++)
-	{
-
+    // Iterate the exact times we need for the required range
+    for (int time = this->accumulation_ranges[range_index].from; time < this->accumulation_ranges[range_index].to; time++)
+    {
 		// based on the time, and the date index, lets find the current day index
 		size_t day_index = date_index + ((time / times_per_day) * (file_lats * file_lons * times_per_day));
 
@@ -446,7 +439,7 @@ float* ObservationReader::ReadRangeFromFile(int date, size_t start[], size_t cou
 				result[result_index] += (value * 3);
 			}
 	
-		}
+        }
 
 	}
 	delete(lon_hours);

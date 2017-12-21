@@ -1,4 +1,5 @@
 #include "forecast_reader.h"
+#include "helper.h"
 #include <stdio.h>
 #include <netcdf.h>
 #include "iostream"
@@ -36,7 +37,7 @@ ForecastReader::~ForecastReader(){
     delete(lats);
     delete(lons);
     if(forecasts_by_range) {
-        for(int i=0; i<this->accumulation_ranges;i++){
+        for(int i=0; i<this->accumulation_ranges.size();i++){
             delete(forecasts_by_range[i]);
         }
         delete(forecasts_by_range);
@@ -166,13 +167,13 @@ bool DateInWindow(struct tm min, struct tm max, struct tm date){
 // Grouping the forecasts by accumulation range. For instance, 3 ranges of 24 hs.
 // accumulation_range_hs: size of one range in hours (example 24hs)
 // accumulation_ranges: amount of ranges (for instance, 3, for a total forecast of 72hs)
-int ForecastReader::Read(int date, int accumulation_range_hs, int accumulation_ranges){
+int ForecastReader::Read(int date/*, int accumulation_range_hs, int accumulation_ranges*/){
 
     // save the accumulation ranges count, for later use
-    this->accumulation_ranges = accumulation_ranges;
+    //int accumulation_ranges = this->accumulation_ranges.size();
 
     size_t const NDIMS = 4;
-    int times_in_range = accumulation_range_hs / 6; // how many times do we have in a range? Each time are 6 hours.
+  //  int times_in_range = 24 /*accumulation_range_hs*/ / 6; // how many times do we have in a range? Each time are 6 hours.
 
     // Get dates limit
     // the current date
@@ -209,8 +210,8 @@ int ForecastReader::Read(int date, int accumulation_range_hs, int accumulation_r
     }
 
     // allocate the forecasts by range structure
-    forecasts_by_range = new float*[accumulation_ranges];
-    for(int range=0; range<accumulation_ranges;range++){
+    forecasts_by_range = new float*[accumulation_ranges.size()];
+    for(int range=0; range<accumulation_ranges.size();range++){
         forecasts_by_range[range] = new float[NLAT * NLON * days.size()];
         memset(forecasts_by_range[range], 0, sizeof(float) * NLAT * NLON * days.size());
     }
@@ -257,11 +258,15 @@ int ForecastReader::Read(int date, int accumulation_range_hs, int accumulation_r
         //cout << "Forecast for Date:" << day << " | " << write_index << endl;
 
         // forecast contains one forecast for multiple hours (every 6 hours), so we need to add by accumulation group
-        for (int range = 0; range < accumulation_ranges; range++){
+
+        for (int range = 0; range < accumulation_ranges.size(); range++){
 
             // (remember, Total precipitation (kg m?2, i.e., mm) in last 6?h period (00, 06, 12, 18 UTC) or in last 3?h period(03, 09, 15, 21 UTC)[Y])
-            int hour_start = range * times_in_range + 1;
-            int hour_end = hour_start + times_in_range;
+            //int hour_start = range * times_in_range + 1;
+            //int hour_end = hour_start + times_in_range;
+
+            int hour_start = accumulation_ranges[range].from + 1;
+            int hour_end = accumulation_ranges[range].to + 1;
 
             for (int hour = hour_start; hour < hour_end; hour ++ )
             {
