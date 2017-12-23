@@ -12,6 +12,9 @@
 class ObservationReader
 {
 public:
+
+    ~ObservationReader();
+
     float *GetInterpolatedValues(int date, int range_index, float init_lat, float init_lon, float end_lat, float end_lon, int amount_steps_lat, int amount_steps_lon);
     float *GetInterpolatedValuesLambert(int date, int range_index, int init_lat_pixel, int init_lon_pixel, int end_lat_pixel, int end_lon_pixel, int amount_steps_lat, int amount_steps_lon, int zoom);
     float *GetRawValues(int date, int range_index);
@@ -32,8 +35,6 @@ public:
     float file_end_lat;
     float delta_lat;
     float delta_lon;
-
-    FILE* file;
 
     float* file_data;
 

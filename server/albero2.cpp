@@ -19,7 +19,6 @@
 
 extern string albero_images_path;
 extern string reforecast_file_path;
-extern int times_in_range;
 
 
 /* Handle errors by printing an error message and exiting with a
@@ -839,23 +838,15 @@ int Albero2::Initialize(int current_date)
     initialized = true;
 
     // Lets clean the structures if they were used
-    if (this->forecasts != NULL) delete(forecasts); forecasts = NULL;
-    if (this->probability_map != NULL) delete(probability_map); probability_map = NULL;
-    if (this->mean_square_error_map != NULL) delete(mean_square_error_map); mean_square_error_map = NULL;
-    if (this->analogs != NULL) delete(analogs); analogs = NULL;
-    if (this->stats!= NULL) delete(stats); stats = NULL;
+    if (this->forecasts != NULL) {delete(forecasts); forecasts = NULL;}
+    if (this->probability_map != NULL) {delete(probability_map); probability_map = NULL;}
+    if (this->mean_square_error_map != NULL) {delete(mean_square_error_map); mean_square_error_map = NULL;}
+    if (this->analogs != NULL) {delete(analogs); analogs = NULL;}
+    if (this->stats!= NULL) {delete(stats); stats = NULL;}
 
     this->current_date = current_date;
 
-    cout << ":: Initializing..." << endl;
-
-    // Create accumulation ranges, just for now we hardcode them.
-    AccumulationRange a1(0,1);  // [0, 24)
-    AccumulationRange a2(1,2);  // [24, 48)
-    AccumulationRange a3(2,3); // [48, 72)
-    this->accumulation_ranges.push_back(a1);
-    this->accumulation_ranges.push_back(a2);
-    this->accumulation_ranges.push_back(a3);
+    cout << ":: Initializing... " << accumulation_ranges.size() << " accumulation ranges." << endl;
 
     this->stats = new Statistics(accumulation_ranges.size());
 

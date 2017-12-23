@@ -324,7 +324,7 @@ float *ObservationReader::GetRawValues(int date, int range_index){
 }
 
 
-void ObservationReader::Dispose(){
+ObservationReader::~ObservationReader(){
 	cout << "[] Cleaning Observation Reader...";
 	delete(file_data);
 	cout << " OK" << endl;
