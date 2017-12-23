@@ -32,11 +32,11 @@ function OpenUberMap(){
 		$("#alberoMipmapDialog #ubermap_body tr").remove();
 
 		// Display HEADERS
-		var accumulation_range = Albero.configuration['accumulation-range'];
+		var accumulation_ranges = Albero.configuration['accumulation-ranges'];
 		$("#alberoMipmapDialog #ubermap-header").append($("<th></th>"));
-		for(var accumulation_range_index = 0; accumulation_range_index < Albero.configuration["accumulation-ranges"]; accumulation_range_index++){
-			var from = accumulation_range * accumulation_range_index; 
-			var to = from + accumulation_range;
+		for(var accumulation_range_index = 0; accumulation_range_index < accumulation_ranges.length; accumulation_range_index++){
+			var from = accumulation_ranges[accumulation_range_index][0]*6;
+			var to = accumulation_ranges[accumulation_range_index][1]*6;
 			var th = $("<th class='ubermap-column-header' range-index='"+accumulation_range_index+"'><span>["+ from + " hs - " + to + " hs)</span></th>");
 			$("#alberoMipmapDialog #ubermap-header").append(th);
 		}
@@ -51,7 +51,7 @@ function OpenUberMap(){
 			var e = tr.append(td);
 
 			// For each accumulation range
-			for(var accumulation_range_index = 0; accumulation_range_index < Albero.configuration["accumulation-ranges"]; accumulation_range_index++){
+			for(var accumulation_range_index = 0; accumulation_range_index < accumulation_ranges.length; accumulation_range_index++){
 				var e = tr.append(RenderSelectorTD(threshold_index, accumulation_range_index));
 				$("#alberoMipmapDialog #ubermap_body").prepend(e);
 			}
@@ -63,7 +63,7 @@ function OpenUberMap(){
 
 		// FORECAST
 		var tr = $("<tr><td class='small'></td></tr>");
-		for(var accumulation_range_index = 0; accumulation_range_index < Albero.configuration["accumulation-ranges"]; accumulation_range_index++){
+		for(var accumulation_range_index = 0; accumulation_range_index < accumulation_ranges.length; accumulation_range_index++){
 				var td = $("<td class='threshold_map_selector label' threshold_index='-4' range_index='"+accumulation_range_index+"'><p>Forecast</p></td>")
 				tr.append(td);
 		}
@@ -72,7 +72,7 @@ function OpenUberMap(){
 
 		// OBSERVED (Only if the observations are available)
 		var tr = $("<tr><td class='small'></td></tr>");
-		for(var accumulation_range_index = 0; accumulation_range_index < Albero.configuration["accumulation-ranges"]; accumulation_range_index++){
+		for(var accumulation_range_index = 0; accumulation_range_index < accumulation_ranges.length; accumulation_range_index++){
 			if(Albero.stats[accumulation_range_index].current_date_has_observations==1){
 				var td = $("<td class='threshold_map_selector label' threshold_index='-2' range_index='"+accumulation_range_index+"'><p>Observed</p></td>")
 				tr.append(td);
@@ -84,7 +84,7 @@ function OpenUberMap(){
 
 		// MSE
 		var tr = $("<tr><td class='small'></td></tr>");
-		for(var accumulation_range_index = 0; accumulation_range_index < Albero.configuration["accumulation-ranges"]; accumulation_range_index++){
+		for(var accumulation_range_index = 0; accumulation_range_index < accumulation_ranges.length; accumulation_range_index++){
 				var td = $("<td class='threshold_map_selector label' threshold_index='-3' range_index='"+accumulation_range_index+"'><p>MSE</p></td>")
 				tr.append(td);
 		}

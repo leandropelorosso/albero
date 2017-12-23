@@ -69,7 +69,7 @@
 	#alberoConfigurationBox ul li.float-right{
 		float:right;
 	}
-
+/*
 	#alberoConfigurationBox .elessar-range{
 		background-color: antiquewhite;
 		text-align: center;
@@ -86,7 +86,7 @@
 	#alberoConfigurationBox .elessar-rangebar{
 	    border: 1px solid darkkhaki;
 	}
-
+*/
 
 	#alberoConfigurationBox input{
 		border: 1px solid lightgray;
@@ -132,11 +132,11 @@
 	width: 350px;
     margin-left: 9px;
 }
-
+/*
 .elessar-barlabel{
 	font-size: 11px;
 }
-
+*/
 
 .radio-section-selector{
     width: 100%;
@@ -155,7 +155,7 @@
     background: none;
 }
 
-#accordion .ui-accordion-header {
+#range-type-selector .ui-accordion-header {
 	background: #f2f2f2;
     border: none;
     border-radius: 0px;
@@ -169,4 +169,8 @@
 
 #alberoConfigurationBox h3{
 	font-weight: bold;
+}
+
+#alberoConfigurationBox .acculumation-range-selector select{
+	width: 64px;
 }

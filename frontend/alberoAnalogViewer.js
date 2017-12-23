@@ -102,8 +102,9 @@ function alberoDisplayAnalogViewer(lat, lon, range_index)
 		
 			// Display new Label
 
-			var from = Albero.configuration["accumulation-range"]*range_index;
-			var to = from + Albero.configuration["accumulation-range"];
+			var accumulation_ranges = Albero.configuration["accumulation-ranges"];
+			var from = accumulation_ranges[range_index][0] * 6;
+			var to = accumulation_ranges[range_index][1] * 6;
 			
 			var center_lat = (Math.ceil(lat)-0.5);
 			var center_lon = (Math.ceil(lon)-0.5);

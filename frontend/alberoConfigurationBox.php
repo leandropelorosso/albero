@@ -14,7 +14,7 @@
 		
 		<ul>
 			<li>Valid Date</li>
-			<li><input id="current-forecast-date" name="date" value="04/01/2013"/></li>
+			<li><input id="current-forecast-date" name="date" value="12/01/2017"/></li>
 		</ul>
 
 		<ul>
@@ -35,38 +35,58 @@
 
 		<h3>Accumulation (hs)</h3> 
 
-		<div id="accordion" style="width: 480px;">
+		<div id="range-type-selector" style="width: 480px;">
 
-			<span>By Lead Time and Length</span>
+			<!-- BY LEAD TIME AND LENGTH -->
+			<span type="by-lead-time-and-length">By Lead Time and Length</span>
 
-			<div>
+				<div>
+					<ul>
+						<li>Accumulation Range</li>
+						<li><select id="albero-toolbox-accumulation-range"><?=printAccumulationRanges(6)?></select></li>
+					</ul>
 
-				<ul>
-					<li>Accumulation Range</li>
-					<li><select id="albero-toolbox-accumulation-range" name="accumulation-range" ><?=printAccumulationRanges(6)?></select></li>
-				</ul>
-
-				<ul>
-					<li>LeadTime</li>
-					<li><select id="ablero-toolbox-lead-time" name="leadtime-from">
-						<option>----</option>
-					</select></li>
-				</ul>
-
-
-			</div>
+					<ul>
+						<li>LeadTime</li>
+						<li><select id="ablero-toolbox-lead-time">
+							<option>----</option>
+						</select></li>
+					</ul>
+				</div>
 			
-			<span>By Range</span>
+			<!-- BY RANGE -->
+			<span type="by-range">By Range</span>
 
-			<div>
-				<ul>
-					<li style="width:472px; margin-bottom:18px;" id="accumulation-range-container"></li>
-				</ul>
-			</div>
+				<div id="accumulation-by-ranges">
+
+					<!-- Range Selector Template -->
+					<!--<div id="acculumation-range-selector-template" class="acculumation-range-selector" hidden>
+						<select class="accumulation-from"></select>
+						<select class="accumulation-to"></select>
+					</div>-->
+
+					<!-- ranges go here -->
+					<div id="accumulation-ranges">
+						<div class="acculumation-range-selector">
+							<select class="accumulation-from"></select>
+							<select class="accumulation-to"></select>
+						</div>
+						<div class="acculumation-range-selector">
+							<select class="accumulation-from"></select>
+							<select class="accumulation-to"></select>
+						</div>
+						<div class="acculumation-range-selector">
+							<select class="accumulation-from"></select>
+							<select class="accumulation-to"></select>
+						</div>
+						<div class="acculumation-range-selector">
+							<select class="accumulation-from"></select>
+							<select class="accumulation-to"></select>
+						</div>
+					</div>
+				</div>
 
 		</div>
-		 
- 
 
 
 <!--

@@ -17,14 +17,16 @@
 	<script src="mipmaps.js"></script>
 	<script type="text/javascript" src="jquery.linkedsliders.min.js"></script>
 	<script type="text/javascript" src="/ThirdParty/jquery.loadmask.min.js"></script>
-	<script type="text/javascript" src="/ThirdParty/elessar.min.js"></script>
+	<!--<script type="text/javascript" src="/ThirdParty/elessar.min.js"></script>-->
 	<script type="text/javascript" src="/ThirdParty/jquery.limitslider.js"></script>
 	<link rel="stylesheet" type="text/css" href="/ThirdParty/jquery.loadmask.css">
-	<link rel="stylesheet" type="text/css" href="/ThirdParty/elessar.css">
+	<!--<link rel="stylesheet" type="text/css" href="/ThirdParty/elessar.css">-->
 	<link rel="stylesheet" type="text/css" href="albero.css">
+	<!--<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css">-->
 	<script src="https://momentjs.com/downloads/moment.min.js"></script>
 	<script src="https://rawgithub.com/quarterto/Estira/master/index.js"></script>
-
+	<script type="text/javascript" src="/ThirdParty/jquery.range-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="/ThirdParty/jquery.range.css">
 
    </head>
 
