@@ -90,6 +90,14 @@ function OpenUberMap(){
 		}
 		$("#alberoMipmapDialog #ubermap_body").append(tr);
 
+
+		// Display Scale
+
+		$("#ubermap_scale img").attr("src", "albero_images/probabilistic_forecast_big_scale.png")
+		$("#ubermap_scale p").text("probability (%)");
+		displayMaxMinInScale("#ubermap_scale", 10, 0, 100, 0, 100,0);
+
+
 }
 
 
@@ -149,12 +157,9 @@ function InitMipmaps(){
 		{
 			$("#albero_floating_scale .scale_indicators .max").hide();  // we dont have this information yet
 			$("#albero_floating_scale .scale_indicators .min").hide();
-
-
-
 			$("#albero_floating_scale img").attr("src", "albero_images/probabilistic_forecast_big_scale.png")
 			$("#albero_floating_scale p").text("probability (%)");
-			displayMaxMinInScale("#albero_floating_scale", 0, 100, stats.min_probabilistic_forecast, stats.max_probabilistic_forecast,0);
+			displayMaxMinInScale("#albero_floating_scale", 10, 0, 100, stats.min_probabilistic_forecast, stats.max_probabilistic_forecast,0);
 		}
 		else
 		{
@@ -177,18 +182,18 @@ min_probabilistic_forecast
 				case -2: // OBSERVATION
 					$("#albero_floating_scale img").attr("src", "albero_images/numerical_forecast_big_scale.png?time="+Date.now());
 					$("#albero_floating_scale p").text("observed precipitation accumulation (mm)");
-					displayMaxMinInScale("#albero_floating_scale", Albero.scale_min_forecast, Albero.scale_max_forecast, stats.min_observation, stats.max_observation,0);
+					displayMaxMinInScale("#albero_floating_scale",12, Albero.scale_min_forecast, Albero.scale_max_forecast, stats.min_observation, stats.max_observation,0);
 
 				break;
 				case -3: // MSE
 					$("#albero_floating_scale img").attr("src", "albero_images/mse_big_scale.png?time="+Date.now());
 					$("#albero_floating_scale p").text("mean squared error");
-					displayMaxMinInScale("#albero_floating_scale", 0, 20, stats.min_mse, stats.max_mse, 0);
+					displayMaxMinInScale("#albero_floating_scale", 10, 0, 20, stats.min_mse, stats.max_mse, 0);
 				break;
 				case -4: // NUMERICAL FORECAST
 					$("#albero_floating_scale img").attr("src", "albero_images/numerical_forecast_big_scale.png?time="+Date.now());
 					$("#albero_floating_scale p").text("numerical forecast (precipitation accumulation) (mm)");
-					displayMaxMinInScale("#albero_floating_scale", Albero.scale_min_forecast, Albero.scale_max_forecast, stats.min_numerical_forecast, stats.max_numerical_forecast,0);
+					displayMaxMinInScale("#albero_floating_scale", 12, Albero.scale_min_forecast, Albero.scale_max_forecast, stats.min_numerical_forecast, stats.max_numerical_forecast,0);
 
 				break;
 
@@ -211,14 +216,47 @@ function UpdateMiniBingmaps(range_index){
 	var stats  = Albero.stats[range_index];
 
 	$("#map-sub-1-wrapper .albero_floating_scale img").attr("src", "albero_images/numerical_forecast_big_scale.png?time="+Date.now());
-	displayMaxMinInScale("#map-sub-1-wrapper .albero_floating_scale", Albero.scale_min_forecast, Albero.scale_max_forecast, stats.min_numerical_forecast, stats.max_numerical_forecast,0);
+	displayMaxMinInScale("#map-sub-1-wrapper .albero_floating_scale", 12, Albero.scale_min_forecast, Albero.scale_max_forecast, stats.min_numerical_forecast, stats.max_numerical_forecast,0);
 
 	$("#map-sub-2-wrapper .albero_floating_scale img").attr("src", "albero_images/numerical_forecast_big_scale.png?time="+Date.now());
-	displayMaxMinInScale("#map-sub-2-wrapper .albero_floating_scale", Albero.scale_min_forecast, Albero.scale_max_forecast, stats.min_observation, stats.max_observation,0);
+	displayMaxMinInScale("#map-sub-2-wrapper .albero_floating_scale", 12, Albero.scale_min_forecast, Albero.scale_max_forecast, stats.min_observation, stats.max_observation,0);
 
 	$("#map-sub-3-wrapper .albero_floating_scale img").attr("src", "albero_images/mse_big_scale.png?time="+Date.now());
-	displayMaxMinInScale("#map-sub-3-wrapper .albero_floating_scale", 0, 20, stats.min_mse, stats.max_mse, 0);
+	displayMaxMinInScale("#map-sub-3-wrapper .albero_floating_scale", 10, 0, 20, stats.min_mse, stats.max_mse, 0);
 
 }
 
 	
+
+function renderScaleNumbers(scale_obj, from, to, step){	
+
+	// find scale image
+	var scale_image = $(scale_obj).find("img.img_scale");
+	// find parent of scale image
+	var container = $(scale_image).parent();
+	// remove existing scale numbers
+	$(container).find(".scale-numbers").remove();
+	// add again
+	$(container).append("<div class='scale-numbers'></div>");
+	var scale_numbers = $(container).find(".scale-numbers");
+	// scale image attributes
+	var scale_image_height = $(scale_image).height()
+	// add numbers
+	for(var i=from; i<=to; i+=step){
+
+		if(from >= 0){	// [a , b] with a > 0
+			var top = (scale_image_height / (to-from)) * i;
+			value = to-i;
+		}else // [a, b] with a < 0
+		{			
+			var top = (scale_image_height/2) - (scale_image_height / (to-from)) * i;
+			value = i;
+		}
+
+		var number = $("<div class='scale-number'>" + value + "</div>");
+		$(number).css("top", top + "px");
+		$(scale_numbers).append($(number));		
+	}
+	
+}
+

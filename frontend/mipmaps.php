@@ -84,14 +84,18 @@
 
 </div>
 
-<div style="position:absolute; width:90px; right:10px; top:0px;">
-	<div class="ubermap_scale">
-		<img style="width:40px; height: auto;" src="albero_resources/probabilistic_scale_vertical.png" ></img>
-		<div>
-		<p style="font-size:11px; text-align:center;">Probability (%)</p>
-		</div>	
-	</div>
+<div id="ubermap_scale" class="map-sub-wrapper">
+	<div class="">
+		<div class="big_scale">
+			<img class="img_scale" width="11" height="152" src="albero_images/probabilistic_forecast_big_scale.png" />
+		</div>
+	</div>	
+	<p style="font-size:11px;margin-left: -37px; text-align:center;">Probability (%)</p>
 </div>
+
+
+
+
 
 
 </div>	

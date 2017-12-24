@@ -1,7 +1,7 @@
 <div style="display:none" id="albero_floating_scale" class="albero_floating_scale">
 	
 	<div class="big_scale">
-		<img class="img_floting_scale" width="11" height="152" src="albero_resources/bias_scale_small.png" />
+		<img class="img_floting_scale img_scale" width="11" height="152" src="albero_resources/bias_scale_small.png" />
 		<div class="scale_indicators">
 			<div class="max">MAX</div>
 			<div class="min">MIN</div>

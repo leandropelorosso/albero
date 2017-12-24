@@ -30,7 +30,8 @@ $(document).ready(function(){
 
 // displays the max and min value on the scale (the color scale next to the regions)
 // zero_at_height indicates, with a number between 0 and 1, where is located the zero in the scale.
-function displayMaxMinInScale(wrapper_selector, min, max, local_min, local_max, zero_at_height){
+// discretization_count is the amount of different values
+function displayMaxMinInScale(wrapper_selector, discretization_count, min, max, local_min, local_max, zero_at_height){
 	
 	// get the heaight of the scale
 	var wrapper = $(wrapper_selector);
@@ -67,6 +68,9 @@ function displayMaxMinInScale(wrapper_selector, min, max, local_min, local_max, 
 
 	max_cursor.css("bottom", max_position);
 	min_cursor.css("bottom", min_position);
+
+	// Render the scale numbers
+	renderScaleNumbers(wrapper_selector, min, max, ((max-min)/discretization_count));
 }
 
 
@@ -162,17 +166,17 @@ function alberoDisplayAnalogViewer(lat, lon, range_index)
 			// GRAPHS
 
 			// Numerical Forecast Mean
-			displayMaxMinInScale("#wrapper_numerical_forecast_mean", Albero.scale_min_forecast, Albero.scale_max_forecast, min_mean_forecast_value, max_mean_forecast_value,0);
+			displayMaxMinInScale("#wrapper_numerical_forecast_mean", 12, Albero.scale_min_forecast, Albero.scale_max_forecast, min_mean_forecast_value, max_mean_forecast_value,0);
 
 			// Forecast Observation Mean
-			displayMaxMinInScale("#wrapper_observation_mean", Albero.scale_min_forecast, Albero.scale_max_forecast, min_mean_observation_value, max_mean_observation_value,0);
+			displayMaxMinInScale("#wrapper_observation_mean", 12, Albero.scale_min_forecast, Albero.scale_max_forecast, min_mean_observation_value, max_mean_observation_value,0);
 
 			// Forecast Observation Mean
-			displayMaxMinInScale("#wrapper_numerical_forecast", Albero.scale_min_forecast, Albero.scale_max_forecast, region_min_forecast_value, region_max_forecast_value,0);
+			displayMaxMinInScale("#wrapper_numerical_forecast", 12, Albero.scale_min_forecast, Albero.scale_max_forecast, region_min_forecast_value, region_max_forecast_value,0);
 
 			// Bias
 			var max_abs_bias = Math.max(Math.abs(max_bias_value), Math.abs(min_bias_value));
-			displayMaxMinInScale("#wrapper_bias", -max_abs_bias, max_abs_bias, min_bias_value, max_bias_value, 0.5);
+			displayMaxMinInScale("#wrapper_bias", 10, -max_abs_bias, max_abs_bias, min_bias_value, max_bias_value, 0.5);
 
 			// ANALOGS
 

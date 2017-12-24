@@ -124,8 +124,13 @@
     height: 100%;
     position: absolute;
     top: 0px;
+    left: 20px;    
 }
 
+#alberoAnalogViewer .scale-numbers .scale-number{
+    left: -4px;
+    text-align: left;
+}
 
 .scale_indicators .max,
 .scale_indicators .min{
@@ -135,7 +140,7 @@
     background-position-y: center;
     background-repeat: no-repeat;
     padding-left: 8px;
-    margin-bottom: -7px;
+    margin-bottom: -4px;
     color: #555555;
 }
 

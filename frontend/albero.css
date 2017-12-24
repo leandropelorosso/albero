@@ -65,3 +65,35 @@ body{
 #mini-bingmaps .albero_floating_scale .img_floting_scale{
     border: 1px solid lightgray;
 }
+
+/* dynamic scale numbers*/
+
+.scale-numbers{
+    position: absolute;
+    top: 0px;
+    left: 20px;
+}
+
+.scale-numbers .scale-number{
+    font-size: 8px;
+    position: absolute;
+    left: -42px;
+    margin-top: -6px;
+    min-width: 20px;
+    text-align: right;
+    line-height: 8px;
+}
+
+/* just as a test, hide the max and min previously displayed */
+.big_scale .total_max, .big_scale .total_min{
+    display: none;
+}
+
+/* ********* */
+
+#ubermap_scale{
+    position: absolute;
+    top: 56px;
+    right: 0px;
+    width: 60px;
+}

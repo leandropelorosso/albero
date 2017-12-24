@@ -15,7 +15,7 @@
 					<div class="big_grid"></div> 
 					<img width="152" height="152" id="analogViewerForecast" src=""/>
 					<div class="big_scale forecast">
-						<img class="img_forecast_scale_small" width="11" height="100%" />
+						<img class="img_forecast_scale_small img_scale" width="11" height="100%" />
 						<div class="scale_indicators">
 							<div class="max">MAX</div>
 							<div class="min">MIN</div>
@@ -32,7 +32,7 @@
 					<img width="152" height="152" id="analogViewerForecastMean"/>
 					<div class="big_grid"></div> 
 					<div class="big_scale forecast">
-						<img class="img_forecast_scale_small" width="11" height="100%" />
+						<img class="img_forecast_scale_small img_scale" width="11" height="100%" />
 						<div class="scale_indicators">
 							<div class="max">MAX</div>
 							<div class="min">MIN</div>
@@ -48,7 +48,7 @@
 					<img width="152" height="152" id="analogViewerObservationMean"/>
 					<div class="big_grid"></div> 
 					<div class="big_scale observation">
-						<img class="img_forecast_scale_small" width="11" height="100%" />
+						<img class="img_forecast_scale_small img_scale" width="11" height="100%" />
 						<div class="scale_indicators">
 							<div class="max">MAX</div>
 							<div class="min">MIN</div>
@@ -64,7 +64,7 @@
 					<img width="152" height="152" id="analogViewerBias"/>
 					<div class="big_grid"></div> 
 					<div class="big_scale bias">
-						<img class="img_bias_scale_small" width="11" height="152" src="albero_resources/bias_scale_small.png" />
+						<img class="img_bias_scale_small img_scale" width="11" height="152" src="albero_resources/bias_scale_small.png" />
 						<div class="scale_indicators">
 							<div class="max">MAX</div>
 							<div class="min">MIN</div>
